@@ -4,7 +4,7 @@ all: blackhc.batchbald docs
 
 blackhc.batchbald: $(SRC)
 	nbdev_build_lib
-	touch blackhc.batchbald
+	touch batchbald
 
 docs_serve: docs
 	cd docs && bundle exec jekyll serve
