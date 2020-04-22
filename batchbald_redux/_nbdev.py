@@ -11,8 +11,8 @@ index = {"JointEntropy": "joint_entropy_computation.ipynb",
 
 modules = ["joint_entropy.py"]
 
-doc_url = "https://blackhc.github.io/batchbald/"
+doc_url = "https://blackhc.github.io/batchbald_redux/"
 
-git_url = "https://github.com/blackhc/batchbald/tree/master/"
+git_url = "https://github.com/blackhc/batchbald_redux/tree/master/"
 
 def custom_doc_links(name): return None

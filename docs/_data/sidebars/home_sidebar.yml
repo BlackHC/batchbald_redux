@@ -16,6 +16,6 @@ entries:
       title: joint_entropy
       url: /joint_entropy_computation
     output: web
-    title: batchbald
+    title: batchbald_redux
   output: web
   title: Sidebar

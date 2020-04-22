@@ -5,8 +5,8 @@ title: joint_entropy
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Compute joint entropy estimates"
-description: "Compute joint entropy estimates"
+summary: "Compute joint entropies"
+description: "Compute joint entropies"
 ---
 <!--
 
@@ -31,34 +31,14 @@ description: "Compute joint entropy estimates"
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Module to help compute joint entropies for dependent categorical variables given via a density $p((y_i)_i|w))$ in the Bayesian setting. We compute the density $p((y_i)_i)$ by marginalizing over $w$.</p>
 <p>Two classes are provided:</p>
-
-<pre><code>* exact computation (which works for up 5 to joint variables);
-* estimate using MC sampling of configurations.</code></pre>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">toma</span> <span class="kn">import</span> <span class="n">toma</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
+<ul>
+<li>exact computation (which works for up 5 to joint variables);</li>
+<li>estimate using importance sampling of configurations.</li>
+</ul>
 
 </div>
-    {% endraw %}
-
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>To run tests, we need a few distributions to run tests with.</p>
@@ -75,44 +55,13 @@ description: "Compute joint entropy estimates"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_mixture_prob_dist</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
   <span class="k">return</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">+</span> <span class="n">m</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
-</pre></div>
 
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p1</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">]</span>
+<span class="n">p1</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">]</span>
 <span class="n">p2</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]</span>
 <span class="n">get_mixture_prob_dist</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([0.3 , 0.2 , 0.15, 0.35])</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -181,16 +130,135 @@ description: "Compute joint entropy estimates"
 </div>
     {% endraw %}
 
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">nested_to_tensor</span><span class="p">(</span><span class="o">*</span><span class="n">l</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ys_ws</span><span class="o">=</span><span class="n">nested_to_tensor</span><span class="p">(</span><span class="n">y1_ws</span><span class="p">,</span> <span class="n">y2_ws</span><span class="p">,</span> <span class="n">y1_ws</span><span class="p">,</span><span class="n">y2_ws</span><span class="p">,</span> <span class="n">y1_ws</span><span class="p">,</span><span class="n">y2_ws</span><span class="p">,</span> <span class="n">y1_ws</span><span class="p">,</span><span class="n">y2_ws</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The number of samples $M=C^N$, where $N$ is the number of variables in the joint and $C$ is the number of classes.</p>
+<h1 id="JointEntropy-interface">JointEntropy interface<a class="anchor-link" href="#JointEntropy-interface"> </a></h1><p>Before we look at any implementations, we want to define an interface that we want to support.</p>
 
 </div>
 </div>
 </div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="JointEntropy" class="doc_header"><code>class</code> <code>JointEntropy</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>JointEntropy</code>()</p>
+</blockquote>
+<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald/joint_entropy_computation#ExactJointEntropy.add_variables"><code>ExactJointEntropy.add_variables</code></a>.</p>
+<p><a href="/batchbald/joint_entropy_computation#ExactJointEntropy.compute"><code>ExactJointEntropy.compute</code></a> computes the joint entropy.</p>
+<p><a href="/batchbald/joint_entropy_computation#ExactJointEntropy.compute_batch"><code>ExactJointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="JointEntropy.add_variables" class="doc_header"><code>JointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L22" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>JointEntropy.add_variables</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
+</blockquote>
+<p>Expands the joint entropy to include more terms.</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="JointEntropy.compute" class="doc_header"><code>JointEntropy.compute</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>JointEntropy.compute</code>()</p>
+</blockquote>
+<p>Computes the entropy of this joint entropy.</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="JointEntropy.compute_batch" class="doc_header"><code>JointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L26" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>JointEntropy.compute_batch</code>(<strong><code>probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+<p>Computes the joint entropy of the added variables together with the batch (one by one).</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Computing-exact-joint-entropies">Computing exact joint entropies<a class="anchor-link" href="#Computing-exact-joint-entropies"> </a></h2><p>To compute exact joint entropies, we have to compute all possible configurations of the $y_i$ and evaluate $p(y_1, \dots, y_n)$ by averaging over $p(y_1, \dots, y_n|w)$.</p>
+<p>The number of samples $M=C^N$, where $N$ is the number of variables in the joint and $C$ is the number of classes.</p>
 <p>For this, we provide a class <a href="/batchbald/joint_entropy_computation#ExactJointEntropy"><code>ExactJointEntropy</code></a> that takes $K$ and starts with no variables in the joint.</p>
 
 </div>
@@ -203,14 +271,7 @@ description: "Compute joint entropy estimates"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># show_doc</span>
-
-<span class="k">class</span> <span class="nc">ExactJointEntropy</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Random variables (all with the same # of categories $C$) can be added via `ExactJointEntropy.add_variables`.</span>
-
-<span class="sd">`ExactJointEntropy.compute` computes the joint entropy.</span>
-
-<span class="sd">`ExactJointEntropy.compute_batch` computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.&quot;&quot;&quot;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">ExactJointEntropy</span><span class="p">(</span><span class="n">JointEntropy</span><span class="p">):</span>
     <span class="n">joint_probs_M_K</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">joint_probs_M_K</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
@@ -297,7 +358,7 @@ description: "Compute joint entropy estimates"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ExactJointEntropy" class="doc_header"><code>class</code> <code>ExactJointEntropy</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ExactJointEntropy</code>(<strong><code>joint_probs_M_K</code></strong>:<code>Tensor</code>)</p>
+<h2 id="ExactJointEntropy" class="doc_header"><code>class</code> <code>ExactJointEntropy</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L34" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ExactJointEntropy</code>(<strong><code>joint_probs_M_K</code></strong>:<code>Tensor</code>) :: <a href="/batchbald/joint_entropy_computation#JointEntropy"><code>JointEntropy</code></a></p>
 </blockquote>
 <p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald/joint_entropy_computation#ExactJointEntropy.add_variables"><code>ExactJointEntropy.add_variables</code></a>.</p>
 <p><a href="/batchbald/joint_entropy_computation#ExactJointEntropy.compute"><code>ExactJointEntropy.compute</code></a> computes the joint entropy.</p>
@@ -324,7 +385,7 @@ description: "Compute joint entropy estimates"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ExactJointEntropy.add_variables" class="doc_header"><code>ExactJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L34" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ExactJointEntropy.add_variables</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
+<h4 id="ExactJointEntropy.empty" class="doc_header"><code>ExactJointEntropy.empty</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L40" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ExactJointEntropy.empty</code>(<strong><code>K</code></strong>:<code>int</code>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -335,8 +396,9 @@ description: "Compute joint entropy estimates"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ExactJointEntropy.compute" class="doc_header"><code>ExactJointEntropy.compute</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L28" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ExactJointEntropy.compute</code>()</p>
+<h4 id="ExactJointEntropy.add_variables" class="doc_header"><code>ExactJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L51" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ExactJointEntropy.add_variables</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
 </blockquote>
+<p>Expands the joint entropy to include more terms.</p>
 
 </div>
 
@@ -346,77 +408,22 @@ description: "Compute joint entropy estimates"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ExactJointEntropy.compute_batch" class="doc_header"><code>ExactJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L51" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ExactJointEntropy.compute_batch</code>(<strong><code>probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="ExactJointEntropy.compute" class="doc_header"><code>ExactJointEntropy.compute</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L45" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ExactJointEntropy.compute</code>()</p>
 </blockquote>
+<p>Computes the entropy of this joint entropy.</p>
 
 </div>
 
 </div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">nested_to_tensor</span><span class="p">(</span><span class="o">*</span><span class="n">l</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span> 
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ys_ws</span><span class="o">=</span><span class="n">nested_to_tensor</span><span class="p">(</span><span class="n">y1_ws</span><span class="p">,</span> <span class="n">y2_ws</span><span class="p">,</span> <span class="n">y1_ws</span><span class="p">,</span><span class="n">y2_ws</span><span class="p">,</span> <span class="n">y1_ws</span><span class="p">,</span><span class="n">y2_ws</span><span class="p">,</span> <span class="n">y1_ws</span><span class="p">,</span><span class="n">y2_ws</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ys_ws</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
 
 <div class="output_area">
 
 
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="ExactJointEntropy.compute_batch" class="doc_header"><code>ExactJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L68" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ExactJointEntropy.compute_batch</code>(<strong><code>probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+<p>Computes the joint entropy of the added variables together with the batch (one by one).</p>
 
-<div class="output_text output_subarea output_execute_result">
-<pre>torch.Size([8, 20, 4])</pre>
 </div>
 
 </div>
@@ -427,6 +434,12 @@ description: "Compute joint entropy estimates"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-usages:">Example usages:<a class="anchor-link" href="#Example-usages:"> </a></h3>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -526,6 +539,450 @@ description: "Compute joint entropy estimates"
 
 <div class="output_text output_subarea output_execute_result">
 <pre>tensor([5.9735, 5.6362, 5.9735, 5.6362, 5.9735, 5.6362, 5.9735, 5.6362],
+       dtype=torch.float64)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Computing--approximate-joint-entropies">Computing  approximate joint entropies<a class="anchor-link" href="#Computing--approximate-joint-entropies"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To compute approximate joint entropies, we have to sample possible configurations of the $y_i$ from $p(y_1, \dots, y_n|w)$ stratified by $p(w)$ and evaluate $p(y_1, \dots, y_n)$ by averaging over $p(y_1, \dots, y_n|w)$.</p>
+<p>The number of samples is $M$, so we use $\frac{M}{K}$ samples per $w$.</p>
+<p>For this, we provide a class <a href="/batchbald/joint_entropy_computation#SampledJointEntropy"><code>SampledJointEntropy</code></a> that takes $K$ and $M$, and implements the 'JointEntropy' interface.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To sample, we need a few helper functions.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">batch_multi_choices</span><span class="p">(</span><span class="n">probs_b_C</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    probs_b_C: Ni... x C</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        choices: Ni... x M</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">probs_B_C</span> <span class="o">=</span> <span class="n">probs_b_C</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">probs_b_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="c1"># samples: Ni... x draw_per_xx</span>
+    <span class="n">choices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probs_B_C</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">replacement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">choices_b_M</span> <span class="o">=</span> <span class="n">choices</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">probs_b_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">[</span><span class="n">M</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">choices_b_M</span>
+
+
+<span class="k">def</span> <span class="nf">gather_expand</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">gather_expand</span><span class="o">.</span><span class="n">DEBUG_CHECKS</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">dr</span> <span class="o">==</span> <span class="n">ir</span> <span class="ow">or</span> <span class="mi">1</span> <span class="ow">in</span> <span class="p">(</span><span class="n">dr</span><span class="p">,</span> <span class="n">ir</span><span class="p">)</span> <span class="k">for</span> <span class="n">dr</span><span class="p">,</span> <span class="n">ir</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="n">max_shape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">dr</span><span class="p">,</span> <span class="n">ir</span><span class="p">)</span> <span class="k">for</span> <span class="n">dr</span><span class="p">,</span> <span class="n">ir</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)]</span>
+    <span class="n">new_data_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">max_shape</span><span class="p">)</span>
+    <span class="n">new_data_shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+
+    <span class="n">new_index_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">max_shape</span><span class="p">)</span>
+    <span class="n">new_index_shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">new_data_shape</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">new_index_shape</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="n">gather_expand</span><span class="o">.</span><span class="n">DEBUG_CHECKS</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="batch_multi_choices" class="doc_header"><code>batch_multi_choices</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L103" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>batch_multi_choices</code>(<strong><code>probs_b_C</code></strong>, <strong><code>M</code></strong>:<code>int</code>)</p>
+</blockquote>
+<p>probs_b_C: Ni... x C</p>
+<p>Returns:
+    choices: Ni... x M</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="gather_expand" class="doc_header"><code>gather_expand</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L119" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>gather_expand</code>(<strong><code>data</code></strong>, <strong><code>dim</code></strong>, <strong><code>index</code></strong>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">SampledJointEntropy</span><span class="p">(</span><span class="n">JointEntropy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Random variables (all with the same # of categories $C$) can be added via `ExactJointEntropy.add_variables`.</span>
+
+<span class="sd">`ExactJointEntropy.compute` computes the joint entropy.</span>
+
+<span class="sd">`ExactJointEntropy.compute_batch` computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.&quot;&quot;&quot;</span>
+    <span class="n">sampled_joint_probs_M_K</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampled_joint_probs_M_K</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span> <span class="o">=</span> <span class="n">sampled_joint_probs_M_K</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="n">K</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;SampledJointEntropy&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SampledJointEntropy</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">K</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+                                            <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;SampledJointEntropy&#39;</span><span class="p">:</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">probs_N_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="c1"># S: num of samples per w</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">M</span> <span class="o">//</span> <span class="n">K</span>
+
+        <span class="n">choices_N_K_S</span> <span class="o">=</span> <span class="n">batch_multi_choices</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+        <span class="n">expanded_choices_N_1_K_S</span> <span class="o">=</span> <span class="n">choices_N_K_S</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="n">expanded_probs_N_K_1_C</span> <span class="o">=</span> <span class="n">probs_N_K_C</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="n">probs_N_K_K_S</span> <span class="o">=</span> <span class="n">gather_expand</span><span class="p">(</span><span class="n">expanded_probs_N_K_1_C</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">expanded_choices_N_1_K_S</span><span class="p">)</span>
+        <span class="c1"># exp sum log seems necessary to avoid 0s?</span>
+        <span class="n">probs_K_K_S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs_N_K_K_S</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">samples_K_M</span> <span class="o">=</span> <span class="n">probs_K_K_S</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">samples_M_K</span> <span class="o">=</span> <span class="n">samples_K_M</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">SampledJointEntropy</span><span class="p">(</span><span class="n">samples_M_K</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">sampled_joint_probs_M</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">nats_M</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sampled_joint_probs_M</span><span class="p">)</span>
+        <span class="n">entropy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nats_M</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">entropy</span>
+
+    <span class="k">def</span> <span class="nf">add_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">M2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;SampledJointEntropy&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">probs_N_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                  
+        <span class="n">sample_K_M1_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="o">.</span><span class="n">t</span><span class="p">()[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+        
+        <span class="n">new_sample_M2_K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">,</span> <span class="n">M2</span><span class="p">)</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span>
+        <span class="n">new_sample_K_1_M2</span> <span class="o">=</span> <span class="n">new_sample_M2_K</span><span class="o">.</span><span class="n">t</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        
+        <span class="n">merged_sample_K_M1_M2</span> <span class="o">=</span> <span class="n">sample_K_M1_1</span> <span class="o">*</span> <span class="n">new_sample_K_1_M2</span>
+        <span class="n">merged_sample_K_M</span> <span class="o">=</span> <span class="n">merged_sample_K_M1_M2</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        
+        <span class="n">merged_sample_M_K</span> <span class="o">=</span> <span class="n">merged_sample_K_M</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">SampledJointEntropy</span><span class="p">(</span><span class="n">merged_sample_M_K</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs_B_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+                            <span class="n">output_entropies_B</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">probs_B_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="n">B</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">probs_B_K_C</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="n">output_entropies_B</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output_entropies_B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">probs_B_K_C</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">probs_B_K_C</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">probs_B_K_C</span><span class="p">,</span>
+                              <span class="n">initial_step</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+                              <span class="n">dimension</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                              <span class="n">context</span><span class="o">=</span><span class="s2">&quot;ExactJointEntropy.batch_joint_entropy&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">chunked_joint_entropy</span><span class="p">(</span><span class="n">chunked_probs_b_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+                                  <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">chunked_probs_b_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">probs_b_M_C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">b</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">),</span>
+                                      <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                                      <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="p">,</span>
+                             <span class="n">probs_B_K_C</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="p">,</span>
+                                               <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                             <span class="n">out</span><span class="o">=</span><span class="n">probs_b_M_C</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">probs_b_M_C</span> <span class="o">/=</span> <span class="n">K</span>
+            
+            <span class="n">q_1_M_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="kc">None</span><span class="p">]</span>
+
+            <span class="n">output_entropies_B</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+                <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs_b_M_C</span><span class="p">)</span> <span class="o">*</span> <span class="n">probs_b_M_C</span> <span class="o">/</span> <span class="n">q_1_M_1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">M</span><span class="p">,</span>
+                                                <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">output_entropies_B</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="SampledJointEntropy" class="doc_header"><code>class</code> <code>SampledJointEntropy</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L141" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SampledJointEntropy</code>(<strong><code>sampled_joint_probs_M_K</code></strong>:<code>Tensor</code>) :: <a href="/batchbald/joint_entropy_computation#JointEntropy"><code>JointEntropy</code></a></p>
+</blockquote>
+<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald/joint_entropy_computation#ExactJointEntropy.add_variables"><code>ExactJointEntropy.add_variables</code></a>.</p>
+<p><a href="/batchbald/joint_entropy_computation#ExactJointEntropy.compute"><code>ExactJointEntropy.compute</code></a> computes the joint entropy.</p>
+<p><a href="/batchbald/joint_entropy_computation#ExactJointEntropy.compute_batch"><code>ExactJointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="SampledJointEntropy.empty" class="doc_header"><code>SampledJointEntropy.empty</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L152" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.empty</code>(<strong><code>K</code></strong>:<code>int</code>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="SampledJointEntropy.sample" class="doc_header"><code>SampledJointEntropy.sample</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L157" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.sample</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>M</code></strong>:<code>int</code>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="SampledJointEntropy.compute" class="doc_header"><code>SampledJointEntropy.compute</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L177" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.compute</code>()</p>
+</blockquote>
+<p>Computes the entropy of this joint entropy.</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="SampledJointEntropy.add_variables" class="doc_header"><code>SampledJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L183" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.add_variables</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>M2</code></strong>:<code>int</code>)</p>
+</blockquote>
+<p>Expands the joint entropy to include more terms.</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="SampledJointEntropy.compute_batch" class="doc_header"><code>SampledJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald/tree/master/batchbald/joint_entropy.py#L197" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.compute_batch</code>(<strong><code>probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+<p>Computes the joint entropy of the added variables together with the batch (one by one).</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-usages">Example usages<a class="anchor-link" href="#Example-usages"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">exact_joint_entropy</span> <span class="o">=</span> <span class="n">SampledJointEntropy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<span class="n">entropy</span> <span class="o">=</span> <span class="n">exact_joint_entropy</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="mi">100000</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">entropy</span><span class="p">,</span> <span class="mf">4.6479</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">entropy</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>tensor(4.6541, dtype=torch.float64)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">exact_joint_entropy</span> <span class="o">=</span> <span class="n">SampledJointEntropy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<span class="n">entropy</span> <span class="o">=</span> <span class="n">exact_joint_entropy</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="mi">100000</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">entropy</span><span class="p">,</span> <span class="mf">4.6479</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">entropy</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>tensor(4.6517, dtype=torch.float64)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">exact_joint_entropy</span> <span class="o">=</span> <span class="n">SampledJointEntropy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+<span class="n">entropies</span> <span class="o">=</span><span class="n">exact_joint_entropy</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">compute_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">entropies</span><span class="p">,</span> <span class="p">[</span><span class="mf">5.9735</span><span class="p">,</span> <span class="mf">5.6362</span><span class="p">,</span> <span class="mf">5.9735</span><span class="p">,</span> <span class="mf">5.6362</span><span class="p">,</span> <span class="mf">5.9735</span><span class="p">,</span> <span class="mf">5.6362</span><span class="p">,</span> <span class="mf">5.9735</span><span class="p">,</span> <span class="mf">5.6362</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">entropies</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>tensor([5.9754, 5.6383, 5.9754, 5.6383, 5.9754, 5.6383, 5.9754, 5.6383],
        dtype=torch.float64)</pre>
 </div>
 

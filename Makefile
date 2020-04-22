@@ -1,8 +1,8 @@
 SRC = $(wildcard ./*.ipynb)
 
-all: blackhc.batchbald docs
+all: batchbald docs
 
-blackhc.batchbald: $(SRC)
+batchbald: $(SRC)
 	nbdev_build_lib
 	touch batchbald
 
