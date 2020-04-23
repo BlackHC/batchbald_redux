@@ -113,19 +113,19 @@ description: "Greedy algorithm and score computation"
 <span class="c1"># y4_ws = [get_mixture_prob_dist(p1, p2, m) for m in np.linspace(0, 1, K)]</span>
 
 <span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
-<span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
 <span class="n">y1_ws</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_mixture_prob_dist</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">K</span><span class="p">)]</span>
 
 <span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
-<span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
 <span class="n">y2_ws</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_mixture_prob_dist</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">K</span><span class="p">)]</span>
 
 <span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
-<span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>
 <span class="n">y3_ws</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_mixture_prob_dist</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">K</span><span class="p">)]</span>
 
 <span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">]</span>
-<span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>
 <span class="n">y4_ws</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_mixture_prob_dist</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">K</span><span class="p">)]</span>
 
 
@@ -167,7 +167,7 @@ description: "Greedy algorithm and score computation"
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>torch.Size([20, 20, 4])</pre>
+<pre>torch.Size([8, 20, 4])</pre>
 </div>
 
 </div>
@@ -285,13 +285,10 @@ description: "Greedy algorithm and score computation"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">conditional_entropies</span> <span class="o">=</span> <span class="n">compute_conditional_entropy</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">)</span>
 
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">conditional_entropies</span><span class="p">,</span> <span class="p">[</span>
-    <span class="mf">1.2939</span><span class="p">,</span> <span class="mf">1.1584</span><span class="p">,</span> <span class="mf">1.1332</span><span class="p">,</span> <span class="mf">1.1273</span><span class="p">,</span> <span class="mf">1.2939</span><span class="p">,</span> <span class="mf">1.1584</span><span class="p">,</span> <span class="mf">1.1332</span><span class="p">,</span> <span class="mf">1.1273</span><span class="p">,</span> <span class="mf">1.2939</span><span class="p">,</span>
-    <span class="mf">1.1584</span><span class="p">,</span> <span class="mf">1.1332</span><span class="p">,</span> <span class="mf">1.1273</span><span class="p">,</span> <span class="mf">1.2939</span><span class="p">,</span> <span class="mf">1.1584</span><span class="p">,</span> <span class="mf">1.1332</span><span class="p">,</span> <span class="mf">1.1273</span><span class="p">,</span> <span class="mf">1.2939</span><span class="p">,</span> <span class="mf">1.1584</span><span class="p">,</span>
-    <span class="mf">1.1332</span><span class="p">,</span> <span class="mf">1.1273</span>
-<span class="p">],</span>
-                   <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-<span class="n">conditional_entropies</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">conditional_entropies</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">conditional_entropies</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">],</span>
+                   <span class="n">atol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -303,14 +300,11 @@ description: "Greedy algorithm and score computation"
 
 <div class="output_area">
 
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>tensor([1.2939, 1.1584, 1.1332, 1.1273, 1.2939, 1.1584, 1.1332, 1.1273, 1.2939,
-        1.1584, 1.1332, 1.1273, 1.2939, 1.1584, 1.1332, 1.1273, 1.2939, 1.1584,
-        1.1332, 1.1273], dtype=torch.float64)</pre>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>tensor([1.2069, 1.2069, 1.2069, 1.2069, 1.2069, 1.2069, 1.2069, 1.2069],
+       dtype=torch.float64)
+</pre>
 </div>
-
 </div>
 
 </div>
@@ -328,13 +322,11 @@ description: "Greedy algorithm and score computation"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">entropies</span> <span class="o">=</span> <span class="n">compute_entropy</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">)</span>
 
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">entropies</span><span class="p">,</span> <span class="p">[</span>
-    <span class="mf">1.3351</span><span class="p">,</span> <span class="mf">1.1683</span><span class="p">,</span> <span class="mf">1.1359</span><span class="p">,</span> <span class="mf">1.1683</span><span class="p">,</span> <span class="mf">1.3351</span><span class="p">,</span> <span class="mf">1.1683</span><span class="p">,</span> <span class="mf">1.1359</span><span class="p">,</span> <span class="mf">1.1683</span><span class="p">,</span> <span class="mf">1.3351</span><span class="p">,</span>
-    <span class="mf">1.1683</span><span class="p">,</span> <span class="mf">1.1359</span><span class="p">,</span> <span class="mf">1.1683</span><span class="p">,</span> <span class="mf">1.3351</span><span class="p">,</span> <span class="mf">1.1683</span><span class="p">,</span> <span class="mf">1.1359</span><span class="p">,</span> <span class="mf">1.1683</span><span class="p">,</span> <span class="mf">1.3351</span><span class="p">,</span> <span class="mf">1.1683</span><span class="p">,</span>
-    <span class="mf">1.1359</span><span class="p">,</span> <span class="mf">1.1683</span>
-<span class="p">],</span>
-                   <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-<span class="n">entropies</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">entropies</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">entropies</span><span class="p">,</span>
+    <span class="p">[</span><span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">],</span>
+                   <span class="n">atol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -346,14 +338,11 @@ description: "Greedy algorithm and score computation"
 
 <div class="output_area">
 
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>tensor([1.3351, 1.1683, 1.1359, 1.1683, 1.3351, 1.1683, 1.1359, 1.1683, 1.3351,
-        1.1683, 1.1359, 1.1683, 1.3351, 1.1683, 1.1359, 1.1683, 1.3351, 1.1683,
-        1.1359, 1.1683], dtype=torch.float64)</pre>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>tensor([1.2376, 1.2376, 1.2376, 1.2376, 1.2376, 1.2376, 1.2376, 1.2376],
+       dtype=torch.float64)
+</pre>
 </div>
-
 </div>
 
 </div>
@@ -526,10 +515,14 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor([0.0191, 0.0191, 0.0247, 0.0247], dtype=torch.float64)
-tensor([0.0429, 0.0429, 0.0482,   -inf], dtype=torch.float64)
-tensor([0.0656, 0.0656,   -inf,   -inf], dtype=torch.float64)
-tensor([0.0823,   -inf,   -inf,   -inf], dtype=torch.float64)
+<pre>tensor([0.0307, 0.0307, 0.0307, 0.0307, 0.0307, 0.0307, 0.0307, 0.0307],
+       dtype=torch.float64)
+tensor([0.0596, 0.0596, 0.0596, 0.0596, 0.0596, 0.0596, 0.0596,   -inf],
+       dtype=torch.float64)
+tensor([0.0869, 0.0869, 0.0869, 0.0869, 0.0869, 0.0869,   -inf,   -inf],
+       dtype=torch.float64)
+tensor([0.1128, 0.1128, 0.1128, 0.1128, 0.1128,   -inf,   -inf,   -inf],
+       dtype=torch.float64)
 </pre>
 </div>
 </div>
@@ -539,7 +532,7 @@ tensor([0.0823,   -inf,   -inf,   -inf], dtype=torch.float64)
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>CandidateBatch(scores=[0.02469264376977609, 0.048220491091593765, 0.0655759872933146, 0.08234692774459429], indices=[3, 2, 1, 0])</pre>
+<pre>CandidateBatch(scores=[0.030715639666234917, 0.059619586271582925, 0.08691070514744759, 0.11275304532467789], indices=[7, 6, 5, 4])</pre>
 </div>
 
 </div>
@@ -619,7 +612,7 @@ tensor([0.0823,   -inf,   -inf,   -inf], dtype=torch.float64)
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>CandidateBatch(scores=[0.02469264376977609, 0.02469264376977609, 0.019083779469080797, 0.019083779469080797], indices=[2, 3, 0, 1])</pre>
+<pre>CandidateBatch(scores=[0.030715639666234917, 0.030715639666234917, 0.030715639666234917, 0.030715639666234917], indices=[2, 6, 3, 7])</pre>
 </div>
 
 </div>
