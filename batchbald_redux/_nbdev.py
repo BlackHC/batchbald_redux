@@ -2,14 +2,20 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"JointEntropy": "joint_entropy_computation.ipynb",
+index = {"compute_conditional_entropy": "batchbald.ipynb",
+         "compute_entropy": "batchbald.ipynb",
+         "CandidateBatch": "batchbald.ipynb",
+         "get_batchbald_batch": "batchbald.ipynb",
+         "JointEntropy": "joint_entropy_computation.ipynb",
          "ExactJointEntropy": "joint_entropy_computation.ipynb",
          "batch_multi_choices": "joint_entropy_computation.ipynb",
          "gather_expand": "joint_entropy_computation.ipynb",
          "gather_expand.DEBUG_CHECKS": "joint_entropy_computation.ipynb",
-         "SampledJointEntropy": "joint_entropy_computation.ipynb"}
+         "SampledJointEntropy": "joint_entropy_computation.ipynb",
+         "DynamicJointEntropy": "joint_entropy_computation.ipynb"}
 
-modules = ["joint_entropy.py"]
+modules = ["batchbald.py",
+           "joint_entropy.py"]
 
 doc_url = "https://blackhc.github.io/batchbald_redux/"
 

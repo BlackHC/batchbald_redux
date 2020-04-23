@@ -2,6 +2,7 @@
   "batchbald_redux": {
     "Overview": "/",
     "module name here": "/core",
-    "joint_entropy": "/joint_entropy_computation"
+    "BatchBALD Algorithm": "/batchbald",
+    "joint_entropy Module": "/joint_entropy_computation"
   }
 }

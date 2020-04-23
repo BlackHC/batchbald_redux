@@ -13,7 +13,10 @@ entries:
       title: module name here
       url: /core
     - output: web,pdf
-      title: joint_entropy
+      title: BatchBALD Algorithm
+      url: /batchbald
+    - output: web,pdf
+      title: joint_entropy Module
       url: /joint_entropy_computation
     output: web
     title: batchbald_redux
