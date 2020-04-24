@@ -45,6 +45,7 @@ description: "Greedy algorithm and score computation"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="kn">from</span> <span class="nn">toma</span> <span class="kn">import</span> <span class="n">toma</span>
 
@@ -92,25 +93,10 @@ description: "Greedy algorithm and score computation"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+
 <span class="k">def</span> <span class="nf">get_mixture_prob_dist</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">+</span> <span class="n">m</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
 
-
-<span class="c1"># p1 = [0.1, 0.2, 0.2, 0.5]</span>
-<span class="c1"># p2 = [0.5, 0.2, 0.1, 0.2]</span>
-<span class="c1"># y1_ws = [get_mixture_prob_dist(p1, p2, m) for m in np.linspace(0, 1, K)]</span>
-
-<span class="c1"># p1 = [0.1, 0.6, 0.2, 0.1]</span>
-<span class="c1"># p2 = [0.1, 0.4, 0.4, 0.1]</span>
-<span class="c1"># y2_ws = [get_mixture_prob_dist(p1, p2, m) for m in np.linspace(0, 1, K)]</span>
-
-<span class="c1"># p1 = [0.1, 0.1, 0.6, 0.2]</span>
-<span class="c1"># p2 = [0.1, 0.1, 0.5, 0.3]</span>
-<span class="c1"># y3_ws = [get_mixture_prob_dist(p1, p2, m) for m in np.linspace(0, 1, K)]</span>
-
-<span class="c1"># p1 = [0.1, 0.1, 0.1, 0.7]</span>
-<span class="c1"># p2 = [0.1, 0.5, 0.1, 0.3]</span>
-<span class="c1"># y4_ws = [get_mixture_prob_dist(p1, p2, m) for m in np.linspace(0, 1, K)]</span>
 
 <span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
 <span class="n">p2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
@@ -133,9 +119,7 @@ description: "Greedy algorithm and score computation"
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span>
 
 
-<span class="n">duplicates</span><span class="o">=</span><span class="mi">2</span> 
-
-<span class="n">ys_ws</span> <span class="o">=</span> <span class="n">nested_to_tensor</span><span class="p">([</span><span class="n">y1_ws</span><span class="p">]</span> <span class="o">*</span> <span class="n">duplicates</span> <span class="o">+</span> <span class="p">[</span><span class="n">y2_ws</span><span class="p">]</span> <span class="o">*</span> <span class="n">duplicates</span> <span class="o">+</span> <span class="p">[</span><span class="n">y3_ws</span><span class="p">]</span> <span class="o">*</span> <span class="n">duplicates</span> <span class="o">+</span> <span class="p">[</span><span class="n">y4_ws</span><span class="p">]</span> <span class="o">*</span> <span class="n">duplicates</span><span class="p">)</span>
+<span class="n">ys_ws</span> <span class="o">=</span> <span class="n">nested_to_tensor</span><span class="p">([</span><span class="n">y1_ws</span><span class="p">,</span> <span class="n">y2_ws</span><span class="p">,</span> <span class="n">y3_ws</span><span class="p">,</span> <span class="n">y4_ws</span><span class="p">])</span>
 </pre></div>
 
     </div>
@@ -167,7 +151,7 @@ description: "Greedy algorithm and score computation"
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>torch.Size([8, 20, 4])</pre>
+<pre>torch.Size([4, 20, 4])</pre>
 </div>
 
 </div>
@@ -193,26 +177,35 @@ description: "Greedy algorithm and score computation"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_conditional_entropy</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
-    
+
     <span class="n">entropies_N</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Conditional Entropy&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
     <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">probs_n_K_C</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">entropies_N</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">probs_n_K_C</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs_n_K_C</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="n">K</span><span class="p">)</span>
-    
+    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">probs_n_K_C</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">entropies_N</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span>
+            <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">probs_n_K_C</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs_n_K_C</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">K</span><span class="p">)</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">entropies_N</span>
 
 
 <span class="k">def</span> <span class="nf">compute_entropy</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
-    
+
     <span class="n">entropies_N</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Entropy&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
     <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">probs_n_K_C</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">mean_probs_N_C</span> <span class="o">=</span> <span class="n">probs_N_K_C</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>        
-        <span class="n">entropies_N</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mean_probs_N_C</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">mean_probs_N_C</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-    
+    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">probs_n_K_C</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">mean_probs_n_C</span> <span class="o">=</span> <span class="n">probs_n_K_C</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">entropies_N</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span>
+            <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mean_probs_n_C</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">mean_probs_n_C</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">entropies_N</span>
-    
 </pre></div>
 
     </div>
@@ -233,7 +226,7 @@ description: "Greedy algorithm and score computation"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="compute_conditional_entropy" class="doc_header"><code>compute_conditional_entropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L16" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>compute_conditional_entropy</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
+<h4 id="compute_conditional_entropy" class="doc_header"><code>compute_conditional_entropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>compute_conditional_entropy</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
 </blockquote>
 
 </div>
@@ -257,7 +250,7 @@ description: "Greedy algorithm and score computation"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="compute_entropy" class="doc_header"><code>compute_entropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L27" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>compute_entropy</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
+<h4 id="compute_entropy" class="doc_header"><code>compute_entropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L34" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>compute_entropy</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
 </blockquote>
 
 </div>
@@ -287,7 +280,7 @@ description: "Greedy algorithm and score computation"
 
 <span class="nb">print</span><span class="p">(</span><span class="n">conditional_entropies</span><span class="p">)</span>
 
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">conditional_entropies</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">],</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">conditional_entropies</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">,</span> <span class="mf">1.2069</span><span class="p">],</span>
                    <span class="n">atol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 
@@ -301,8 +294,7 @@ description: "Greedy algorithm and score computation"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor([1.2069, 1.2069, 1.2069, 1.2069, 1.2069, 1.2069, 1.2069, 1.2069],
-       dtype=torch.float64)
+<pre>tensor([1.2069, 1.2069, 1.2069, 1.2069], dtype=torch.float64)
 </pre>
 </div>
 </div>
@@ -325,7 +317,7 @@ description: "Greedy algorithm and score computation"
 <span class="nb">print</span><span class="p">(</span><span class="n">entropies</span><span class="p">)</span>
 
 <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">entropies</span><span class="p">,</span>
-    <span class="p">[</span><span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">,</span> <span class="mf">1.2376</span><span class="p">],</span>
                    <span class="n">atol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 
@@ -339,8 +331,7 @@ description: "Greedy algorithm and score computation"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor([1.2376, 1.2376, 1.2376, 1.2376, 1.2376, 1.2376, 1.2376, 1.2376],
-       dtype=torch.float64)
+<pre>tensor([1.2376, 1.2376, 1.2376, 1.2376], dtype=torch.float64)
 </pre>
 </div>
 </div>
@@ -388,12 +379,12 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
                         <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
-    
+
     <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-    
+
     <span class="n">candidate_indices</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">candidate_scores</span> <span class="o">=</span> <span class="p">[]</span>
-    
+
     <span class="k">if</span> <span class="n">batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">CandidateBatch</span><span class="p">(</span><span class="n">candidate_scores</span><span class="p">,</span> <span class="n">candidate_indices</span><span class="p">)</span>
 
@@ -408,22 +399,23 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
     <span class="c1"># We always keep these on the CPU.</span>
     <span class="n">scores_N</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
-    
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;BatchBALD&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">latest_index</span> <span class="o">=</span> <span class="n">candidate_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">batch_joint_entropy</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span>
                 <span class="n">probs_N_K_C</span><span class="p">[</span><span class="n">latest_index</span><span class="p">:</span><span class="n">latest_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
-        
-        <span class="n">shared_conditinal_entropies</span> <span class="o">=</span> <span class="n">conditional_entropies_N</span><span class="p">[</span><span class="n">candidate_indices</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        
+
+        <span class="n">shared_conditinal_entropies</span> <span class="o">=</span> <span class="n">conditional_entropies_N</span><span class="p">[</span>
+            <span class="n">candidate_indices</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
         <span class="n">batch_joint_entropy</span><span class="o">.</span><span class="n">compute_batch</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">,</span>
                                           <span class="n">output_entropies_B</span><span class="o">=</span><span class="n">scores_N</span><span class="p">)</span>
-        
+
         <span class="n">scores_N</span> <span class="o">-=</span> <span class="n">conditional_entropies_N</span> <span class="o">+</span> <span class="n">shared_conditinal_entropies</span>
         <span class="n">scores_N</span><span class="p">[</span><span class="n">candidate_indices</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
-        
-        <span class="nb">print</span><span class="p">(</span><span class="n">scores_N</span><span class="p">)</span>
+
+        <span class="c1"># print(scores_N)</span>
 
         <span class="n">candidate_score</span><span class="p">,</span> <span class="n">candidate_index</span> <span class="o">=</span> <span class="n">scores_N</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
@@ -451,7 +443,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="CandidateBatch" class="doc_header"><code>class</code> <code>CandidateBatch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L43" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CandidateBatch</code>(<strong><code>scores</code></strong>:<code>List</code>[<code>float</code>], <strong><code>indices</code></strong>:<code>List</code>[<code>int</code>])</p>
+<h2 id="CandidateBatch" class="doc_header"><code>class</code> <code>CandidateBatch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L54" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CandidateBatch</code>(<strong><code>scores</code></strong>:<code>List</code>[<code>float</code>], <strong><code>indices</code></strong>:<code>List</code>[<code>int</code>])</p>
 </blockquote>
 <p>CandidateBatch(scores: List[float], indices: List[int])</p>
 
@@ -476,7 +468,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_batchbald_batch" class="doc_header"><code>get_batchbald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L48" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbald_batch</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_batchbald_batch" class="doc_header"><code>get_batchbald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L59" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbald_batch</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -515,14 +507,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor([0.0307, 0.0307, 0.0307, 0.0307, 0.0307, 0.0307, 0.0307, 0.0307],
-       dtype=torch.float64)
-tensor([0.0596, 0.0596, 0.0596, 0.0596, 0.0596, 0.0596, 0.0596,   -inf],
-       dtype=torch.float64)
-tensor([0.0869, 0.0869, 0.0869, 0.0869, 0.0869, 0.0869,   -inf,   -inf],
-       dtype=torch.float64)
-tensor([0.1128, 0.1128, 0.1128, 0.1128, 0.1128,   -inf,   -inf,   -inf],
-       dtype=torch.float64)
+<pre>
 </pre>
 </div>
 </div>
@@ -532,7 +517,7 @@ tensor([0.1128, 0.1128, 0.1128, 0.1128, 0.1128,   -inf,   -inf,   -inf],
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>CandidateBatch(scores=[0.030715639666234917, 0.059619586271582925, 0.08691070514744759, 0.11275304532467789], indices=[7, 6, 5, 4])</pre>
+<pre>CandidateBatch(scores=[0.030715639666234917, 0.05961958627158248, 0.08691070514744581, 0.11275304532467789], indices=[3, 2, 1, 0])</pre>
 </div>
 
 </div>
@@ -545,7 +530,7 @@ tensor([0.1128, 0.1128, 0.1128, 0.1128, 0.1128,   -inf,   -inf,   -inf],
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Encore:-BALD">Encore: BALD<a class="anchor-link" href="#Encore:-BALD"> </a></h2><p>BALD is the same as BatchBALD, except that we pick candidates independently from each other.</p>
+<h2 id="BALD">BALD<a class="anchor-link" href="#BALD"> </a></h2><p>BALD is the same as BatchBALD, except that we evaluate points individually, by computing $I[y_i;w]$ for each, and then take the top $B$ scorers.</p>
 
 </div>
 </div>
@@ -559,11 +544,10 @@ tensor([0.1128, 0.1128, 0.1128, 0.1128, 0.1128,   -inf,   -inf,   -inf],
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_bald_batch</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
                    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                   <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                    <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
-    
+
     <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
 
     <span class="n">candidate_indices</span> <span class="o">=</span> <span class="p">[]</span>
@@ -571,13 +555,37 @@ tensor([0.1128, 0.1128, 0.1128, 0.1128, 0.1128,   -inf,   -inf,   -inf],
 
     <span class="n">scores_N</span> <span class="o">=</span> <span class="n">compute_entropy</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">)</span>
     <span class="n">scores_N</span> <span class="o">-=</span> <span class="n">compute_conditional_entropy</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">)</span>
-    
+
     <span class="n">candiate_scores</span><span class="p">,</span> <span class="n">candidate_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
-    
+
     <span class="k">return</span> <span class="n">CandidateBatch</span><span class="p">(</span><span class="n">candiate_scores</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">candidate_indices</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="get_bald_batch" class="doc_header"><code>get_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L113" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_bald_batch</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -597,7 +605,7 @@ tensor([0.1128, 0.1128, 0.1128, 0.1128, 0.1128,   -inf,   -inf,   -inf],
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_bald_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_bald_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="mi">4</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -612,7 +620,7 @@ tensor([0.1128, 0.1128, 0.1128, 0.1128, 0.1128,   -inf,   -inf,   -inf],
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>CandidateBatch(scores=[0.030715639666234917, 0.030715639666234917, 0.030715639666234917, 0.030715639666234917], indices=[2, 6, 3, 7])</pre>
+<pre>CandidateBatch(scores=[0.030715639666234917, 0.030715639666234917, 0.030715639666234695, 0.030715639666234695], indices=[1, 3, 2, 0])</pre>
 </div>
 
 </div>

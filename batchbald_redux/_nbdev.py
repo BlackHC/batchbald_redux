@@ -2,20 +2,36 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"compute_conditional_entropy": "batchbald.ipynb",
+index = {"ActiveLearningData": "active_learning.ipynb",
+         "get_balanced_sample_indices": "active_learning.ipynb",
+         "get_subset_base_indices": "active_learning.ipynb",
+         "get_base_indices": "active_learning.ipynb",
+         "RandomFixedLengthSampler": "active_learning.ipynb",
+         "compute_conditional_entropy": "batchbald.ipynb",
          "compute_entropy": "batchbald.ipynb",
          "CandidateBatch": "batchbald.ipynb",
          "get_batchbald_batch": "batchbald.ipynb",
+         "get_bald_batch": "batchbald.ipynb",
+         "BayesianModule": "consistent_mc_dropout.ipynb",
+         "ConsistentMCDropout": "consistent_mc_dropout.ipynb",
+         "ConsistentMCDropout2d": "consistent_mc_dropout.ipynb",
          "JointEntropy": "joint_entropy_computation.ipynb",
          "ExactJointEntropy": "joint_entropy_computation.ipynb",
          "batch_multi_choices": "joint_entropy_computation.ipynb",
          "gather_expand": "joint_entropy_computation.ipynb",
          "gather_expand.DEBUG_CHECKS": "joint_entropy_computation.ipynb",
          "SampledJointEntropy": "joint_entropy_computation.ipynb",
-         "DynamicJointEntropy": "joint_entropy_computation.ipynb"}
+         "DynamicJointEntropy": "joint_entropy_computation.ipynb",
+         "TransformedDataset": "repeated_mnist.ipynb",
+         "create_repeated_MNIST_dataset": "repeated_mnist.ipynb",
+         "create_MNIST_dataset": "repeated_mnist.ipynb",
+         "get_targets": "repeated_mnist.ipynb"}
 
-modules = ["batchbald.py",
-           "joint_entropy.py"]
+modules = ["active_learning.py",
+           "batchbald.py",
+           "consistent_mc_dropout.py",
+           "joint_entropy.py",
+           "repeated_mnist.py"]
 
 doc_url = "https://blackhc.github.io/batchbald_redux/"
 

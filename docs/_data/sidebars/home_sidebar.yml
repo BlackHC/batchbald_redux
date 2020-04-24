@@ -10,14 +10,23 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: module name here
-      url: /core
+      title: Active learning
+      url: /active_learning
     - output: web,pdf
       title: BatchBALD Algorithm
       url: /batchbald
     - output: web,pdf
-      title: joint_entropy Module
+      title: Consistent MC Dropout
+      url: /consistent_mc_dropout
+    - output: web,pdf
+      title: Example Experiment
+      url: /example_experiment
+    - output: web,pdf
+      title: Joint entropies
       url: /joint_entropy_computation
+    - output: web,pdf
+      title: Repeated-MNIST dataset
+      url: /repeated_mnist
     output: web
     title: batchbald_redux
   output: web

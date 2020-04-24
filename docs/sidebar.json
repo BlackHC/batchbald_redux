@@ -1,8 +1,11 @@
 {
   "batchbald_redux": {
     "Overview": "/",
-    "module name here": "/core",
+    "Active learning": "/active_learning",
     "BatchBALD Algorithm": "/batchbald",
-    "joint_entropy Module": "/joint_entropy_computation"
+    "Consistent MC Dropout": "/consistent_mc_dropout",
+    "Example Experiment": "/example_experiment",
+    "Joint entropies": "/joint_entropy_computation",
+    "Repeated-MNIST dataset": "/repeated_mnist"
   }
 }
