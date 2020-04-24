@@ -51,7 +51,6 @@ class BayesianModule(Module):
 class _ConsistentMCDropout(Module):
     def __init__(self, p=0.5):
         super().__init__()
-        self.k = None
 
         if p < 0 or p > 1:
             raise ValueError("dropout probability has to be between 0 and 1, " "but got {}".format(p))

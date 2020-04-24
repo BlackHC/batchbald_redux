@@ -60,6 +60,7 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span> <span class="k">as</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
@@ -151,58 +152,10 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">num_initial_samples</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="n">num_classes</span> <span class="o">=</span> <span class="mi">10</span>
 
-<span class="n">active_learning_data</span> <span class="o">=</span> <span class="n">active_learning</span><span class="o">.</span><span class="n">ActiveLearningData</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
-
 <span class="n">initial_samples</span> <span class="o">=</span> <span class="n">active_learning</span><span class="o">.</span><span class="n">get_balanced_sample_indices</span><span class="p">(</span>
     <span class="n">repeated_mnist</span><span class="o">.</span><span class="n">get_targets</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">),</span>
     <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
     <span class="n">n_per_digit</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="c1"># Split off the initial samples first.</span>
-<span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">initial_samples</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_batch_size</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">64</span>
-<span class="n">scoring_batch_size</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">epoch_samples</span> <span class="o">=</span> <span class="mi">8192</span><span class="o">*</span><span class="mi">4</span>
-
-<span class="n">use_cuda</span> <span class="o">=</span> <span class="kc">False</span>
-
-<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;pin_memory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span> <span class="k">if</span> <span class="n">use_cuda</span> <span class="k">else</span> <span class="p">{}</span>
-
-<span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span>
-                                          <span class="n">batch_size</span><span class="o">=</span><span class="n">test_batch_size</span><span class="p">,</span>
-                                          <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-    <span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
-    <span class="n">sampler</span><span class="o">=</span><span class="n">active_learning</span><span class="o">.</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
-                                     <span class="n">epoch_samples</span><span class="p">),</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-    <span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="n">scoring_batch_size</span><span class="p">,</span>
-    <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -221,25 +174,68 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># experiment</span>
 <span class="n">max_training_samples</span> <span class="o">=</span> <span class="mi">150</span>
-<span class="n">acquisition_batch_size</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">num_inference_samples</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">acquisition_batch_size</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">num_inference_samples</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">num_test_inference_samples</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">num_samples</span> <span class="o">=</span> <span class="mi">100000</span>
 
+<span class="n">test_batch_size</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">scoring_batch_size</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">epoch_samples</span> <span class="o">=</span> <span class="mi">4096</span> <span class="o">*</span> <span class="mi">6</span>
+
+<span class="n">use_cuda</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;use_cuda: </span><span class="si">{use_cuda}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">use_cuda</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
+
+<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;pin_memory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span> <span class="k">if</span> <span class="n">use_cuda</span> <span class="k">else</span> <span class="p">{}</span>
+
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span>
+                                          <span class="n">batch_size</span><span class="o">=</span><span class="n">test_batch_size</span><span class="p">,</span>
+                                          <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="n">active_learning_data</span> <span class="o">=</span> <span class="n">active_learning</span><span class="o">.</span><span class="n">ActiveLearningData</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+
+<span class="c1"># Split off the initial samples first.</span>
+<span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">initial_samples</span><span class="p">)</span>
+
+<span class="n">active_learning_data</span><span class="o">.</span><span class="n">extract_dataset_from_pool</span><span class="p">(</span><span class="mi">40000</span><span class="p">)</span>
+
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
+    <span class="n">sampler</span><span class="o">=</span><span class="n">active_learning</span><span class="o">.</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span>
+        <span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="n">epoch_samples</span><span class="p">),</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span>
+                                          <span class="n">batch_size</span><span class="o">=</span><span class="n">scoring_batch_size</span><span class="p">,</span>
+                                          <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Run experiment</span>
 <span class="n">test_accs</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">test_loss</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">added_indices</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Num acquired samples: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">),</span>
+            <span class="n">total</span><span class="o">=</span><span class="n">max_training_samples</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Training Set Size&quot;</span><span class="p">)</span>
 
-    <span class="n">model</span> <span class="o">=</span> <span class="n">BayesianCNN</span><span class="p">(</span><span class="n">num_classes</span><span class="p">)</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">BayesianCNN</span><span class="p">(</span><span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
 
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
     <span class="c1"># Train</span>
-    <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Training&quot;</span><span class="p">):</span>
-        <span class="c1">#data = data.cuda()</span>
-        <span class="c1">#target = target.cuda()</span>
+    <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Training&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
@@ -253,11 +249,13 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
     <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Testing&quot;</span><span class="p">):</span>
-            <span class="c1">#data = data.cuda()</span>
-            <span class="c1">#target = target.cuda()</span>
+        <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Testing&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-            <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">num_test_inference_samples</span><span class="p">),</span>
+                <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">num_test_inference_samples</span><span class="p">)</span>
             <span class="n">loss</span> <span class="o">+=</span> <span class="n">F</span><span class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
 
             <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
@@ -277,24 +275,44 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
 
     <span class="c1"># Acquire pool predictions</span>
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">)</span>
-    <span class="n">probs_N_K_C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">num_inference_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">))</span>
+    <span class="n">logits_N_K_C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">num_inference_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">),</span>
+                               <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+                               <span class="n">pin_memory</span><span class="o">=</span><span class="n">use_cuda</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
-                <span class="n">tqdm</span><span class="p">(</span><span class="n">available_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Evaluating Acquisition Set&quot;</span><span class="p">)):</span>
-            <span class="n">lower</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">available_loader</span><span class="o">.</span><span class="n">batch_size</span>
-            <span class="n">upper</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lower</span> <span class="o">+</span> <span class="n">available_loader</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-            <span class="n">probs_N_K_C</span><span class="p">[</span><span class="n">lower</span><span class="p">:</span><span class="n">upper</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
-                <span class="n">data</span><span class="p">,</span> <span class="n">num_inference_samples</span><span class="p">)</span><span class="o">.</span><span class="n">double</span><span class="p">()</span><span class="o">.</span><span class="n">exp_</span><span class="p">()</span>
+                <span class="n">tqdm</span><span class="p">(</span><span class="n">pool_loader</span><span class="p">,</span>
+                     <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Evaluating Acquisition Set&quot;</span><span class="p">,</span>
+                     <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">batchbald</span><span class="o">.</span><span class="n">get_batchbald_batch</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">,</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">pool_loader</span><span class="o">.</span><span class="n">batch_size</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lower</span> <span class="o">+</span> <span class="n">pool_loader</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+            <span class="n">logits_N_K_C</span><span class="p">[</span><span class="n">lower</span><span class="p">:</span><span class="n">upper</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">model</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">num_inference_samples</span><span class="p">)</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span>
+                                            <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">batchbald</span><span class="o">.</span><span class="n">get_bald_batch</span><span class="p">(</span><span class="n">logits_N_K_C</span><span class="p">,</span>
                                                     <span class="n">acquisition_batch_size</span><span class="p">,</span>
-                                                    <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+                                                    <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+                                                    <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">repeated_mnist</span><span class="o">.</span><span class="n">get_targets</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">)</span>
+        <span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">get_dataset_indices</span><span class="p">(</span>
+            <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
 
-    <span class="n">targets</span> <span class="o">=</span> <span class="n">repeated_mnist</span><span class="o">.</span><span class="n">get_targets</span><span class="p">(</span>
-        <span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset indices: &quot;</span><span class="p">,</span> <span class="n">dataset_indices</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scores: &quot;</span><span class="p">,</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labels: &quot;</span><span class="p">,</span> <span class="n">targets</span><span class="p">[</span><span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">])</span>
+
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">batchbald</span><span class="o">.</span><span class="n">get_batchbald_batch</span><span class="p">(</span><span class="n">logits_N_K_C</span><span class="p">,</span>
+                                                        <span class="n">acquisition_batch_size</span><span class="p">,</span>
+                                                        <span class="n">num_samples</span><span class="p">,</span>
+                                                        <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+                                                        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
     <span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">get_dataset_indices</span><span class="p">(</span>
         <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
 
@@ -304,6 +322,7 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
 
     <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
     <span class="n">added_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset_indices</span><span class="p">)</span>
+    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset_indices</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -316,123 +335,84 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Num acquired samples: 20
-
+<pre>use_cuda: True
+Test set: Average loss: 1.7548, Accuracy: 6384/10000 (63.84%)
+Dataset indices:  [27197 10511 29872 30421 35346]
+Scores:  [1.292394707299277, 1.2461161793541076, 1.2453282978380864, 1.239481607774827, 1.2341025991271541]
+Labels:  tensor([8, 3, 6, 6, 3])
+tensor(1.2924, dtype=torch.float64)
+tensor(2.3293, dtype=torch.float64)
+tensor(3.1643, dtype=torch.float64)
+tensor(3.7291, dtype=torch.float64)
+tensor(4.1025, dtype=torch.float64)
+Dataset indices:  [27197 57003 29872     7 14635]
+Scores:  [1.2923947072992776, 2.329264424313895, 3.164252993927856, 3.7290878123981615, 4.102464566898702]
+Labels:  tensor([8, 0, 6, 3, 3])
+Test set: Average loss: 1.6077, Accuracy: 6758/10000 (67.58%)
+Dataset indices:  [36429 21443 50078 45256 22720]
+Scores:  [1.2264650072258103, 1.20665936342657, 1.1961156930574124, 1.1946810897032019, 1.1876093401441876]
+Labels:  tensor([8, 2, 9, 5, 5])
+tensor(1.2265, dtype=torch.float64)
+tensor(2.3059, dtype=torch.float64)
+tensor(3.1733, dtype=torch.float64)
+tensor(3.7812, dtype=torch.float64)
+tensor(4.1556, dtype=torch.float64)
+Dataset indices:  [36429  9348 45832 22720 36491]
+Scores:  [1.2264650072258108, 2.3059482325341736, 3.173319779278138, 3.781195169468023, 4.155579688730191]
+Labels:  tensor([8, 4, 2, 5, 6])
+Test set: Average loss: 1.2542, Accuracy: 7195/10000 (71.95%)
+Dataset indices:  [28567 26760  2761 53979  6636]
+Scores:  [1.2009661249377026, 1.151279102844347, 1.1414231876109713, 1.1354140969261595, 1.129971102536362]
+Labels:  tensor([2, 8, 8, 8, 5])
+tensor(1.2010, dtype=torch.float64)
+tensor(2.2764, dtype=torch.float64)
+tensor(3.1276, dtype=torch.float64)
+tensor(3.7491, dtype=torch.float64)
+tensor(4.1164, dtype=torch.float64)
+Dataset indices:  [28567 53979 39453 22169 22743]
+Scores:  [1.2009661249377035, 2.2764039260171707, 3.1276025968118173, 3.749139800528724, 4.116352882690027]
+Labels:  tensor([2, 8, 2, 2, 7])
+Test set: Average loss: 1.3763, Accuracy: 7306/10000 (73.06%)
+Dataset indices:  [14851 22575  3402 26534 33840]
+Scores:  [1.2655554331398218, 1.2115835165447182, 1.1866193964344587, 1.184529995866177, 1.1820928779033504]
+Labels:  tensor([3, 5, 3, 3, 3])
+tensor(1.2656, dtype=torch.float64)
+tensor(2.3293, dtype=torch.float64)
+tensor(3.1751, dtype=torch.float64)
+tensor(3.7659, dtype=torch.float64)
+tensor(4.1264, dtype=torch.float64)
+Dataset indices:  [14851 22575 38301 31847 30123]
+Scores:  [1.2655554331398218, 2.32928214553672, 3.175116531042806, 3.7658568024728405, 4.126371635540551]
+Labels:  tensor([3, 5, 4, 8, 0])
+Test set: Average loss: 1.0217, Accuracy: 7597/10000 (75.97%)
+Dataset indices:  [ 5062 44381 56627 41900 31046]
+Scores:  [1.235732028357852, 1.2029919966312257, 1.1800793694303422, 1.1435562927120584, 1.1432617767755258]
+Labels:  tensor([9, 5, 9, 2, 6])
+tensor(1.2357, dtype=torch.float64)
+tensor(2.3277, dtype=torch.float64)
+tensor(3.1517, dtype=torch.float64)
+tensor(3.7445, dtype=torch.float64)
+tensor(4.1147, dtype=torch.float64)
+Dataset indices:  [ 5062 44381  3676 23028 15494]
+Scores:  [1.2357320283578526, 2.327710782050392, 3.1516793669584073, 3.7444853551229227, 4.114718228487794]
+Labels:  tensor([9, 5, 2, 2, 7])
+Test set: Average loss: 0.8912, Accuracy: 7625/10000 (76.25%)
+Dataset indices:  [ 7833  4500 46129 42428 40856]
+Scores:  [1.2643048307037117, 1.260924740416801, 1.2401310050532453, 1.2385981688187813, 1.2364716636914745]
+Labels:  tensor([5, 0, 2, 5, 8])
+tensor(1.2643, dtype=torch.float64)
+tensor(2.3384, dtype=torch.float64)
+tensor(3.2479, dtype=torch.float64)
+tensor(3.8409, dtype=torch.float64)
+tensor(4.2037, dtype=torch.float64)
+Dataset indices:  [ 7833 46948 47925 11619 39409]
+Scores:  [1.2643048307037121, 2.338370465636314, 3.2479182123158568, 3.840896635081446, 4.203677270926962]
+Labels:  tensor([5, 5, 3, 3, 5])
+Test set: Average loss: 0.9557, Accuracy: 7475/10000 (74.75%)
 </pre>
 </div>
 </div>
 
-<div class="output_area">
-
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">KeyboardInterrupt</span>                         Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-117-45cd19080005&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-intense-fg ansi-bold">     12</span> 
-<span class="ansi-green-intense-fg ansi-bold">     13</span>     <span class="ansi-red-fg"># Train</span>
-<span class="ansi-green-fg">---&gt; 14</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">for</span> data<span class="ansi-blue-fg">,</span> target <span class="ansi-green-fg">in</span> tqdm<span class="ansi-blue-fg">(</span>train_loader<span class="ansi-blue-fg">,</span> desc<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;Training&#34;</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     15</span>         <span class="ansi-red-fg">#data = data.cuda()</span>
-<span class="ansi-green-intense-fg ansi-bold">     16</span>         <span class="ansi-red-fg">#target = target.cuda()</span>
-
-<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/tqdm/notebook.py</span> in <span class="ansi-cyan-fg">__iter__</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">    216</span>     <span class="ansi-green-fg">def</span> __iter__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    217</span>         <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 218</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">for</span> obj <span class="ansi-green-fg">in</span> super<span class="ansi-blue-fg">(</span>tqdm_notebook<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>__iter__<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    219</span>                 <span class="ansi-red-fg"># return super(tqdm...) will not catch exception</span>
-<span class="ansi-green-intense-fg ansi-bold">    220</span>                 <span class="ansi-green-fg">yield</span> obj
-
-<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/tqdm/std.py</span> in <span class="ansi-cyan-fg">__iter__</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-intense-fg ansi-bold">   1125</span> 
-<span class="ansi-green-intense-fg ansi-bold">   1126</span>         <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">-&gt; 1127</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">for</span> obj <span class="ansi-green-fg">in</span> iterable<span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">   1128</span>                 <span class="ansi-green-fg">yield</span> obj
-<span class="ansi-green-intense-fg ansi-bold">   1129</span>                 <span class="ansi-red-fg"># Update and possibly print the progressbar.</span>
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torch/utils/data/dataloader.py</span> in <span class="ansi-cyan-fg">__next__</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-intense-fg ansi-bold">    343</span> 
-<span class="ansi-green-intense-fg ansi-bold">    344</span>     <span class="ansi-green-fg">def</span> __next__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 345</span><span class="ansi-red-fg">         </span>data <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_next_data<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    346</span>         self<span class="ansi-blue-fg">.</span>_num_yielded <span class="ansi-blue-fg">+=</span> <span class="ansi-cyan-fg">1</span>
-<span class="ansi-green-intense-fg ansi-bold">    347</span>         <span class="ansi-green-fg">if</span> self<span class="ansi-blue-fg">.</span>_dataset_kind <span class="ansi-blue-fg">==</span> _DatasetKind<span class="ansi-blue-fg">.</span>Iterable <span class="ansi-green-fg">and</span><span class="ansi-red-fg"> </span><span class="ansi-red-fg">\</span>
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torch/utils/data/dataloader.py</span> in <span class="ansi-cyan-fg">_next_data</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-intense-fg ansi-bold">    383</span>     <span class="ansi-green-fg">def</span> _next_data<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    384</span>         index <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_next_index<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>  <span class="ansi-red-fg"># may raise StopIteration</span>
-<span class="ansi-green-fg">--&gt; 385</span><span class="ansi-red-fg">         </span>data <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_dataset_fetcher<span class="ansi-blue-fg">.</span>fetch<span class="ansi-blue-fg">(</span>index<span class="ansi-blue-fg">)</span>  <span class="ansi-red-fg"># may raise StopIteration</span>
-<span class="ansi-green-intense-fg ansi-bold">    386</span>         <span class="ansi-green-fg">if</span> self<span class="ansi-blue-fg">.</span>_pin_memory<span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    387</span>             data <span class="ansi-blue-fg">=</span> _utils<span class="ansi-blue-fg">.</span>pin_memory<span class="ansi-blue-fg">.</span>pin_memory<span class="ansi-blue-fg">(</span>data<span class="ansi-blue-fg">)</span>
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torch/utils/data/_utils/fetch.py</span> in <span class="ansi-cyan-fg">fetch</span><span class="ansi-blue-fg">(self, possibly_batched_index)</span>
-<span class="ansi-green-intense-fg ansi-bold">     42</span>     <span class="ansi-green-fg">def</span> fetch<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> possibly_batched_index<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     43</span>         <span class="ansi-green-fg">if</span> self<span class="ansi-blue-fg">.</span>auto_collation<span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 44</span><span class="ansi-red-fg">             </span>data <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">[</span>self<span class="ansi-blue-fg">.</span>dataset<span class="ansi-blue-fg">[</span>idx<span class="ansi-blue-fg">]</span> <span class="ansi-green-fg">for</span> idx <span class="ansi-green-fg">in</span> possibly_batched_index<span class="ansi-blue-fg">]</span>
-<span class="ansi-green-intense-fg ansi-bold">     45</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     46</span>             data <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>dataset<span class="ansi-blue-fg">[</span>possibly_batched_index<span class="ansi-blue-fg">]</span>
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torch/utils/data/_utils/fetch.py</span> in <span class="ansi-cyan-fg">&lt;listcomp&gt;</span><span class="ansi-blue-fg">(.0)</span>
-<span class="ansi-green-intense-fg ansi-bold">     42</span>     <span class="ansi-green-fg">def</span> fetch<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> possibly_batched_index<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     43</span>         <span class="ansi-green-fg">if</span> self<span class="ansi-blue-fg">.</span>auto_collation<span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 44</span><span class="ansi-red-fg">             </span>data <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">[</span>self<span class="ansi-blue-fg">.</span>dataset<span class="ansi-blue-fg">[</span>idx<span class="ansi-blue-fg">]</span> <span class="ansi-green-fg">for</span> idx <span class="ansi-green-fg">in</span> possibly_batched_index<span class="ansi-blue-fg">]</span>
-<span class="ansi-green-intense-fg ansi-bold">     45</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     46</span>             data <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>dataset<span class="ansi-blue-fg">[</span>possibly_batched_index<span class="ansi-blue-fg">]</span>
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torch/utils/data/dataset.py</span> in <span class="ansi-cyan-fg">__getitem__</span><span class="ansi-blue-fg">(self, idx)</span>
-<span class="ansi-green-intense-fg ansi-bold">    255</span> 
-<span class="ansi-green-intense-fg ansi-bold">    256</span>     <span class="ansi-green-fg">def</span> __getitem__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> idx<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 257</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>dataset<span class="ansi-blue-fg">[</span>self<span class="ansi-blue-fg">.</span>indices<span class="ansi-blue-fg">[</span>idx<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">]</span>
-<span class="ansi-green-intense-fg ansi-bold">    258</span> 
-<span class="ansi-green-intense-fg ansi-bold">    259</span>     <span class="ansi-green-fg">def</span> __len__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torchvision/datasets/mnist.py</span> in <span class="ansi-cyan-fg">__getitem__</span><span class="ansi-blue-fg">(self, index)</span>
-<span class="ansi-green-intense-fg ansi-bold">     95</span> 
-<span class="ansi-green-intense-fg ansi-bold">     96</span>         <span class="ansi-green-fg">if</span> self<span class="ansi-blue-fg">.</span>transform <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 97</span><span class="ansi-red-fg">             </span>img <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>transform<span class="ansi-blue-fg">(</span>img<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     98</span> 
-<span class="ansi-green-intense-fg ansi-bold">     99</span>         <span class="ansi-green-fg">if</span> self<span class="ansi-blue-fg">.</span>target_transform <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torchvision/transforms/transforms.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">(self, img)</span>
-<span class="ansi-green-intense-fg ansi-bold">     68</span>     <span class="ansi-green-fg">def</span> __call__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> img<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     69</span>         <span class="ansi-green-fg">for</span> t <span class="ansi-green-fg">in</span> self<span class="ansi-blue-fg">.</span>transforms<span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 70</span><span class="ansi-red-fg">             </span>img <span class="ansi-blue-fg">=</span> t<span class="ansi-blue-fg">(</span>img<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     71</span>         <span class="ansi-green-fg">return</span> img
-<span class="ansi-green-intense-fg ansi-bold">     72</span> 
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torchvision/transforms/transforms.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">(self, tensor)</span>
-<span class="ansi-green-intense-fg ansi-bold">    173</span>             Tensor<span class="ansi-blue-fg">:</span> Normalized Tensor image<span class="ansi-blue-fg">.</span>
-<span class="ansi-green-intense-fg ansi-bold">    174</span>         &#34;&#34;&#34;
-<span class="ansi-green-fg">--&gt; 175</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> F<span class="ansi-blue-fg">.</span>normalize<span class="ansi-blue-fg">(</span>tensor<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>mean<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>std<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>inplace<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    176</span> 
-<span class="ansi-green-intense-fg ansi-bold">    177</span>     <span class="ansi-green-fg">def</span> __repr__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/.conda/envs/active_learning/lib/python3.7/site-packages/torchvision/transforms/functional.py</span> in <span class="ansi-cyan-fg">normalize</span><span class="ansi-blue-fg">(tensor, mean, std, inplace)</span>
-<span class="ansi-green-intense-fg ansi-bold">    216</span>     mean <span class="ansi-blue-fg">=</span> torch<span class="ansi-blue-fg">.</span>as_tensor<span class="ansi-blue-fg">(</span>mean<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>dtype<span class="ansi-blue-fg">,</span> device<span class="ansi-blue-fg">=</span>tensor<span class="ansi-blue-fg">.</span>device<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    217</span>     std <span class="ansi-blue-fg">=</span> torch<span class="ansi-blue-fg">.</span>as_tensor<span class="ansi-blue-fg">(</span>std<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>dtype<span class="ansi-blue-fg">,</span> device<span class="ansi-blue-fg">=</span>tensor<span class="ansi-blue-fg">.</span>device<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">--&gt; 218</span><span class="ansi-red-fg">     </span>tensor<span class="ansi-blue-fg">.</span>sub_<span class="ansi-blue-fg">(</span>mean<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">:</span><span class="ansi-blue-fg">,</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">,</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>div_<span class="ansi-blue-fg">(</span>std<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">:</span><span class="ansi-blue-fg">,</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">,</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    219</span>     <span class="ansi-green-fg">return</span> tensor
-<span class="ansi-green-intense-fg ansi-bold">    220</span> 
-
-<span class="ansi-red-fg">KeyboardInterrupt</span>: </pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># experiment</span>
-</pre></div>
-
-    </div>
 </div>
 </div>
 

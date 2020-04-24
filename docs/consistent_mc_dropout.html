@@ -146,7 +146,6 @@ description: "Custom consistent dropout modules"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">_ConsistentMCDropout</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dropout probability has to be between 0 and 1, &quot;</span> <span class="s2">&quot;but got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
@@ -222,7 +221,7 @@ description: "Custom consistent dropout modules"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConsistentMCDropout" class="doc_header"><code>class</code> <code>ConsistentMCDropout</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L107" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
+<h2 id="ConsistentMCDropout" class="doc_header"><code>class</code> <code>ConsistentMCDropout</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L106" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
 </blockquote>
 <p>Randomly zeroes some of the elements of the input
 tensor with probability :attr:<code>p</code> using samples from a Bernoulli
@@ -275,7 +274,7 @@ identity function.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConsistentMCDropout2d" class="doc_header"><code>class</code> <code>ConsistentMCDropout2d</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L143" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout2d</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
+<h2 id="ConsistentMCDropout2d" class="doc_header"><code>class</code> <code>ConsistentMCDropout2d</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L142" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout2d</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
 </blockquote>
 <p>Randomly zeroes whole channels of the input tensor.
 The channels to zero-out are randomized on every forward call.</p>

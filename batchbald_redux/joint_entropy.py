@@ -81,12 +81,11 @@ class ExactJointEntropy(JointEntropy):
                                              dtype=probs_B_K_C.dtype,
                                              device=probs_B_K_C.device)
 
-        pbar = tqdm(total=B, desc="ExactJointEntropy.compute_batch")
+        pbar = tqdm(total=B, desc="ExactJointEntropy.compute_batch", leave=False)
 
         @toma.execute.chunked(probs_B_K_C,
                               initial_step=1024,
-                              dimension=0,
-                              context="ExactJointEntropy.batch_joint_entropy")
+                              dimension=0)
         def chunked_joint_entropy(chunked_probs_b_K_C: torch.Tensor,
                                   start: int, end: int):
             b = chunked_probs_b_K_C.shape[0]
@@ -96,7 +95,7 @@ class ExactJointEntropy(JointEntropy):
                                       device=self.joint_probs_M_K.device)
             for i in range(b):
                 torch.matmul(self.joint_probs_M_K,
-                             probs_B_K_C[i].to(self.joint_probs_M_K,
+                             chunked_probs_b_K_C[i].to(self.joint_probs_M_K,
                                                non_blocking=True),
                              out=probs_b_M_C[i])
             probs_b_M_C /= K
@@ -106,6 +105,8 @@ class ExactJointEntropy(JointEntropy):
                                                 non_blocking=True)
 
             pbar.update(end - start)
+
+        pbar.close()
 
         return output_entropies_B
 
@@ -225,12 +226,11 @@ class SampledJointEntropy(JointEntropy):
                                              dtype=probs_B_K_C.dtype,
                                              device=probs_B_K_C.device)
 
-        pbar = tqdm(total=B, desc="SampledJointEntropy.compute_batch")
+        pbar = tqdm(total=B, desc="SampledJointEntropy.compute_batch", leave=False)
 
         @toma.execute.chunked(probs_B_K_C,
                               initial_step=1024,
-                              dimension=0,
-                              context="ExactJointEntropy.batch_joint_entropy")
+                              dimension=0)
         def chunked_joint_entropy(chunked_probs_b_K_C: torch.Tensor,
                                   start: int, end: int):
             b = chunked_probs_b_K_C.shape[0]
@@ -256,6 +256,8 @@ class SampledJointEntropy(JointEntropy):
 
             pbar.update(end - start)
 
+        pbar.close()
+
         return output_entropies_B
 
 # Cell
@@ -277,13 +279,13 @@ class DynamicJointEntropy(JointEntropy):
 
     def add_variables(self, probs_N_K_C: torch.Tensor) -> 'DynamicJointEntropy':
         C = self.probs_max_N_K_C.shape[2]
-        new_N = probs_N_K_C.shape[0]
+        add_N = probs_N_K_C.shape[0]
 
-        assert self.probs_max_N_K_C.shape[0] >= self.N + new_N
+        assert self.probs_max_N_K_C.shape[0] >= self.N + add_N
         assert self.probs_max_N_K_C.shape[2] == C
 
-        self.probs_max_N_K_C[self.N:self.N+new_N] = probs_N_K_C
-        self.N += new_N
+        self.probs_max_N_K_C[self.N:self.N+add_N] = probs_N_K_C
+        self.N += add_N
 
         num_exact_samples = C**self.N
         if num_exact_samples > self.M:
