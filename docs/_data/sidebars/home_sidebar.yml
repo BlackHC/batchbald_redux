@@ -22,7 +22,7 @@ entries:
       title: Active Learning
       url: /active_learning
     - output: web,pdf
-      title: Repeated-MNIST dataset
+      title: Repeated-MNIST Dataset
       url: /repeated_mnist
     - output: web,pdf
       title: Example Experiment
