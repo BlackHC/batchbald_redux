@@ -24,24 +24,13 @@ class BayesianModule(Module):
     def forward(self, input_B: torch.Tensor, k: int):
         BayesianModule.k = k
 
-        input_B = self.deterministic_forward_impl(input_B)
         mc_input_BK = BayesianModule.mc_tensor(input_B, k)
         mc_output_BK = self.mc_forward_impl(mc_input_BK)
         mc_output_B_K = BayesianModule.unflatten_tensor(mc_output_BK, k)
         return mc_output_B_K
 
-    def deterministic_forward_impl(self, input: torch.Tensor):
-        return input
-
     def mc_forward_impl(self, mc_input_BK: torch.Tensor):
         return mc_input_BK
-
-    def set_dropout_p(self, p):
-        def update_k(module: Module):
-            if isinstance(module, _MCDropout):
-                module.p = p
-
-        self.apply(update_k)
 
     @staticmethod
     def unflatten_tensor(input: torch.Tensor, k: int):
@@ -57,7 +46,7 @@ class BayesianModule(Module):
         mc_shape = [input.shape[0], k] + list(input.shape[1:])
         return input.unsqueeze(1).expand(mc_shape).flatten(0, 1)
 
-# Internal Cell
+# Cell
 
 class _ConsistentMCDropout(Module):
     def __init__(self, p=0.5):

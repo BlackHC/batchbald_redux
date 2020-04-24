@@ -13,67 +13,76 @@ import collections
 
 # Cell
 
+
 class ActiveLearningData:
     """Splits `dataset` into an active dataset and an available dataset."""
-    active_dataset: data.Dataset
-    available_dataset: data.Dataset
+    dataset: data.Dataset
+    training_dataset: data.Dataset
+    pool_dataset: data.Dataset
+    training_mask: np.ndarray
+    pool_mask: np.ndarray
 
     def __init__(self, dataset: data.Dataset):
         super().__init__()
         self.dataset = dataset
-        self.active_mask = np.full((len(dataset),), False)
-        self.available_mask = np.full((len(dataset),), True)
+        self.training_mask = np.full((len(dataset), ), False)
+        self.pool_mask = np.full((len(dataset), ), True)
 
-        self.active_dataset = data.Subset(self.dataset, None)
-        self.available_dataset = data.Subset(self.dataset, None)
+        self.training_dataset = data.Subset(self.dataset, None)
+        self.pool_dataset = data.Subset(self.dataset, None)
 
         self._update_indices()
 
     def _update_indices(self):
-        self.active_dataset.indices = np.nonzero(self.active_mask)[0]
-        self.available_dataset.indices = np.nonzero(self.available_mask)[0]
+        self.training_dataset.indices = np.nonzero(self.training_mask)[0]
+        self.pool_dataset.indices = np.nonzero(self.pool_mask)[0]
 
-    def get_dataset_indices(self, available_indices: List[int]) -> List[int]:
-        indices = self.available_dataset.indices[available_indices]
+    def get_dataset_indices(self, pool_indices: List[int]) -> List[int]:
+        """Transform indices (in `pool_dataset`) to indices in the original `dataset`."""
+        indices = self.pool_dataset.indices[pool_indices]
         return indices
 
-    def acquire(self, available_indices):
-        indices = self.get_dataset_indices(available_indices)
+    def acquire(self, pool_indices):
+        """Acquire elements from the pool dataset into the training dataset.
 
-        self.active_mask[indices] = True
-        self.available_mask[indices] = False
+        Add them to training dataset & remove them from the pool dataset."""
+        indices = self.get_dataset_indices(pool_indices)
+
+        self.training_mask[indices] = True
+        self.pool_mask[indices] = False
         self._update_indices()
 
-    def make_unavailable(self, available_indices):
-        indices = self.get_dataset_indices(available_indices)
+    def remove_from_pool(self, pool_indices):
+        indices = self.get_dataset_indices(pool_indices)
 
-        self.available_mask[indices] = False
+        self.pool_mask[indices] = False
         self._update_indices()
 
-    def get_random_available_indices(self, size) -> torch.LongTensor:
-        assert 0 <= size <= len(self.available_dataset)
-        available_indices = torch.randperm(len(self.available_dataset))[:size]
-        return available_indices
+    def get_random_pool_indices(self, size) -> torch.LongTensor:
+        assert 0 <= size <= len(self.pool_dataset)
+        pool_indices = torch.randperm(len(self.pool_dataset))[:size]
+        return pool_indices
 
-    def extract_dataset(self, size) -> data.Dataset:
-        """Extract a dataset randomly from the available dataset and make those indices unavailable.
-
-        Useful for extracting a validation set."""
-        return self.extract_dataset_from_indices(self.get_random_available_indices(size))
-
-    def extract_dataset_from_indices(self, available_indices) -> data.Dataset:
-        """Extract a dataset from the available dataset and make those indices unavailable.
+    def extract_dataset_from_pool(self, size) -> data.Dataset:
+        """Extract a dataset randomly from the pool dataset and make those indices unavailable.
 
         Useful for extracting a validation set."""
-        dataset_indices = self.get_dataset_indices(available_indices)
+        return self.extract_dataset_from_pool_from_indices(
+            self.get_random_pool_indices(size))
 
-        self.make_unavailable(available_indices)
+    def extract_dataset_from_pool_from_indices(self, pool_indices) -> data.Dataset:
+        """Extract a dataset from the pool dataset and make those indices unavailable.
+
+        Useful for extracting a validation set."""
+        dataset_indices = self.get_dataset_indices(pool_indices)
+
+        self.remove_from_pool(pool_indices)
         return data.Subset(self.dataset, dataset_indices)
-
 
 # Cell
 
 def get_balanced_sample_indices(target_classes: List, num_classes, n_per_digit=2) -> List[int]:
+    """Given `target_classes` randomly sample `n_per_digit` for each of the `num_classes` classes."""
     permed_indices = torch.randperm(len(target_classes))
 
     if n_per_digit == 0:
@@ -114,8 +123,10 @@ class RandomFixedLengthSampler(data.Sampler):
 
     This sampler takes a `dataset` and draws `target_length` samples from it (with repetition).
     """
+    dataset: data.Dataset
+    target_length: int
 
-    def __init__(self, dataset: data.Dataset, target_length):
+    def __init__(self, dataset: data.Dataset, target_length: int):
         super().__init__(dataset)
         self.dataset = dataset
         self.target_length = target_length

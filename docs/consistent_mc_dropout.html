@@ -30,7 +30,8 @@ description: "Custom consistent dropout modules"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>For BNNs, we are going to use MC dropout.</p>
-<p>To be able to compute BatchBALD scores, we need consistent MC dropout, which uses the consistent masks for inference. That means, that we draw $K$ masks and then use them to draw the $K$ samples.</p>
+<p>To be able to compute BatchBALD scores, we need consistent MC dropout, which uses the consistent masks for inference. That means, that we draw $K$ masks and then keep them fixed while drawing the $K$ inference samples for each input in the test set.</p>
+<p>During training, masks are redrawn for every sample.</p>
 
 </div>
 </div>
@@ -45,7 +46,7 @@ description: "Custom consistent dropout modules"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Bayesian-Module">Bayesian Module<a class="anchor-link" href="#Bayesian-Module"> </a></h2><p>To make this work in an efficient way, we are going to define an abstract wrapper module that takes a batch <code>input_B</code> and outputs <code>results_B_K</code>.</p>
-<p>Internally, it will pass the batch through <code>deterministic_forward_impl</code>, which can be overridden, and then blow it up to $(B \cdot K) \times \cdots$ and then pass it to <code>mc_forward_impl</code>, which can be overriden.</p>
+<p>Internally, it will blow up the input batch to $(B \cdot K) \times \cdots$ and then pass it to <code>mc_forward_impl</code>, which should be overriden.</p>
 <p><a href="/batchbald_redux/consistent_mc_dropout#ConsistentMCDropout"><code>ConsistentMCDropout</code></a> layers will know to reshape the inputs to $B \times K \times \cdots$ and apply consistent masks.</p>
 
 </div>
@@ -54,6 +55,51 @@ description: "Custom consistent dropout modules"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">BayesianModule</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A module that we can sample multiple times from given a single input batch.</span>
+
+<span class="sd">    To be efficient, the module allows for a part of the forward pass to be deterministic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="c1"># Returns B x n x output</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_B</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">BayesianModule</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+
+        <span class="n">mc_input_BK</span> <span class="o">=</span> <span class="n">BayesianModule</span><span class="o">.</span><span class="n">mc_tensor</span><span class="p">(</span><span class="n">input_B</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">mc_output_BK</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_forward_impl</span><span class="p">(</span><span class="n">mc_input_BK</span><span class="p">)</span>
+        <span class="n">mc_output_B_K</span> <span class="o">=</span> <span class="n">BayesianModule</span><span class="o">.</span><span class="n">unflatten_tensor</span><span class="p">(</span><span class="n">mc_output_BK</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mc_output_B_K</span>
+
+    <span class="k">def</span> <span class="nf">mc_forward_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mc_input_BK</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mc_input_BK</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">unflatten_tensor</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="k">return</span> <span class="nb">input</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">flatten_tensor</span><span class="p">(</span><span class="n">mc_input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mc_input</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">mc_tensor</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">mc_shape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="nb">input</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">mc_shape</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -93,6 +139,74 @@ description: "Custom consistent dropout modules"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">_ConsistentMCDropout</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dropout probability has to be between 0 and 1, &quot;</span> <span class="s2">&quot;but got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;p=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">reset_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset_mask</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_sample_mask_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_shape</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sample_shape</span>
+
+    <span class="k">def</span> <span class="nf">_create_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="n">mask_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_sample_mask_shape</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">mask_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">bernoulli_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mask</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">input</span>
+
+        <span class="n">k</span> <span class="o">=</span> <span class="n">BayesianModule</span><span class="o">.</span><span class="n">k</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="c1"># Create a new mask on each call and for each batch element.</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_mask</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># print(&#39;recreating mask&#39;, self)</span>
+                <span class="c1"># Recreate mask.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_mask</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+
+        <span class="n">mc_input</span> <span class="o">=</span> <span class="n">BayesianModule</span><span class="o">.</span><span class="n">unflatten_tensor</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">mc_output</span> <span class="o">=</span> <span class="n">mc_input</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="c1"># Flatten MCDI, batch into one dimension again.</span>
+        <span class="k">return</span> <span class="n">BayesianModule</span><span class="o">.</span><span class="n">flatten_tensor</span><span class="p">(</span><span class="n">mc_output</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -108,7 +222,7 @@ description: "Custom consistent dropout modules"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConsistentMCDropout" class="doc_header"><code>class</code> <code>ConsistentMCDropout</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L118" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
+<h2 id="ConsistentMCDropout" class="doc_header"><code>class</code> <code>ConsistentMCDropout</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L107" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
 </blockquote>
 <p>Randomly zeroes some of the elements of the input
 tensor with probability :attr:<code>p</code> using samples from a Bernoulli
@@ -161,7 +275,7 @@ identity function.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConsistentMCDropout2d" class="doc_header"><code>class</code> <code>ConsistentMCDropout2d</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L154" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout2d</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
+<h2 id="ConsistentMCDropout2d" class="doc_header"><code>class</code> <code>ConsistentMCDropout2d</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L143" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout2d</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
 </blockquote>
 <p>Randomly zeroes whole channels of the input tensor.
 The channels to zero-out are randomized on every forward call.</p>
@@ -195,6 +309,80 @@ feature maps and should be used instead.</p>
 <p>.. _Efficient Object Localization Using Convolutional Networks:
    <a href="http://arxiv.org/abs/1411.4280">http://arxiv.org/abs/1411.4280</a></p>
 
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Example">Example<a class="anchor-link" href="#Example"> </a></h2><p>The following defines a DNN module that can learn MNIST.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span> <span class="k">as</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+
+<span class="k">class</span> <span class="nc">BayesianCNN</span><span class="p">(</span><span class="n">BayesianModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1_drop</span> <span class="o">=</span> <span class="n">ConsistentMCDropout2d</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2_drop</span> <span class="o">=</span> <span class="n">ConsistentMCDropout2d</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1_drop</span> <span class="o">=</span> <span class="n">ConsistentMCDropout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">mc_forward_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="nb">input</span><span class="p">)))</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">input</span>
+    
+<span class="n">BayesianCNN</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>BayesianCNN(
+  (conv1): Conv2d(1, 32, kernel_size=(5, 5), stride=(1, 1))
+  (conv1_drop): ConsistentMCDropout2d(p=0.5)
+  (conv2): Conv2d(32, 64, kernel_size=(5, 5), stride=(1, 1))
+  (conv2_drop): ConsistentMCDropout2d(p=0.5)
+  (fc1): Linear(in_features=1024, out_features=128, bias=True)
+  (fc1_drop): ConsistentMCDropout(p=0.5)
+  (fc2): Linear(in_features=128, out_features=10, bias=True)
+)</pre>
 </div>
 
 </div>

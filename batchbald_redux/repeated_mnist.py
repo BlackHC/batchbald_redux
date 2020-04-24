@@ -73,7 +73,9 @@ def create_MNIST_dataset():
 
 
 def get_targets(dataset):
-    """Get the targets of a dataset without any target transforms."""
+    """Get the targets of a dataset without any target transforms.
+
+    This supports subsets and other derivative datasets."""
     if isinstance(dataset, TransformedDataset):
         return get_targets(dataset.dataset)
     if isinstance(dataset, data.Subset):
