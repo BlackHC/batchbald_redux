@@ -202,8 +202,6 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
 <span class="c1"># Split off the initial samples first.</span>
 <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">initial_samples</span><span class="p">)</span>
 
-<span class="n">active_learning_data</span><span class="o">.</span><span class="n">extract_dataset_from_pool</span><span class="p">(</span><span class="mi">40000</span><span class="p">)</span>
-
 <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
     <span class="n">sampler</span><span class="o">=</span><span class="n">active_learning</span><span class="o">.</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span>
@@ -293,26 +291,15 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
             <span class="n">logits_N_K_C</span><span class="p">[</span><span class="n">lower</span><span class="p">:</span><span class="n">upper</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">model</span><span class="p">(</span>
                 <span class="n">data</span><span class="p">,</span> <span class="n">num_inference_samples</span><span class="p">)</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span>
                                             <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            
-        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">batchbald</span><span class="o">.</span><span class="n">get_bald_batch</span><span class="p">(</span><span class="n">logits_N_K_C</span><span class="p">,</span>
-                                                    <span class="n">acquisition_batch_size</span><span class="p">,</span>
-                                                    <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
-                                                    <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-        
-        <span class="n">targets</span> <span class="o">=</span> <span class="n">repeated_mnist</span><span class="o">.</span><span class="n">get_targets</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">)</span>
-        <span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">get_dataset_indices</span><span class="p">(</span>
-            <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset indices: &quot;</span><span class="p">,</span> <span class="n">dataset_indices</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scores: &quot;</span><span class="p">,</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labels: &quot;</span><span class="p">,</span> <span class="n">targets</span><span class="p">[</span><span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">])</span>
-
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">batchbald</span><span class="o">.</span><span class="n">get_batchbald_batch</span><span class="p">(</span><span class="n">logits_N_K_C</span><span class="p">,</span>
                                                         <span class="n">acquisition_batch_size</span><span class="p">,</span>
                                                         <span class="n">num_samples</span><span class="p">,</span>
                                                         <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
                                                         <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
+    <span class="n">targets</span> <span class="o">=</span> <span class="n">repeated_mnist</span><span class="o">.</span><span class="n">get_targets</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">)</span>
     <span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">get_dataset_indices</span><span class="p">(</span>
         <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
 
@@ -336,79 +323,39 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>use_cuda: True
-Test set: Average loss: 1.7548, Accuracy: 6384/10000 (63.84%)
-Dataset indices:  [27197 10511 29872 30421 35346]
-Scores:  [1.292394707299277, 1.2461161793541076, 1.2453282978380864, 1.239481607774827, 1.2341025991271541]
-Labels:  tensor([8, 3, 6, 6, 3])
-tensor(1.2924, dtype=torch.float64)
-tensor(2.3293, dtype=torch.float64)
-tensor(3.1643, dtype=torch.float64)
-tensor(3.7291, dtype=torch.float64)
-tensor(4.1025, dtype=torch.float64)
-Dataset indices:  [27197 57003 29872     7 14635]
-Scores:  [1.2923947072992776, 2.329264424313895, 3.164252993927856, 3.7290878123981615, 4.102464566898702]
-Labels:  tensor([8, 0, 6, 3, 3])
-Test set: Average loss: 1.6077, Accuracy: 6758/10000 (67.58%)
-Dataset indices:  [36429 21443 50078 45256 22720]
-Scores:  [1.2264650072258103, 1.20665936342657, 1.1961156930574124, 1.1946810897032019, 1.1876093401441876]
-Labels:  tensor([8, 2, 9, 5, 5])
-tensor(1.2265, dtype=torch.float64)
-tensor(2.3059, dtype=torch.float64)
-tensor(3.1733, dtype=torch.float64)
-tensor(3.7812, dtype=torch.float64)
-tensor(4.1556, dtype=torch.float64)
-Dataset indices:  [36429  9348 45832 22720 36491]
-Scores:  [1.2264650072258108, 2.3059482325341736, 3.173319779278138, 3.781195169468023, 4.155579688730191]
-Labels:  tensor([8, 4, 2, 5, 6])
-Test set: Average loss: 1.2542, Accuracy: 7195/10000 (71.95%)
-Dataset indices:  [28567 26760  2761 53979  6636]
-Scores:  [1.2009661249377026, 1.151279102844347, 1.1414231876109713, 1.1354140969261595, 1.129971102536362]
-Labels:  tensor([2, 8, 8, 8, 5])
-tensor(1.2010, dtype=torch.float64)
-tensor(2.2764, dtype=torch.float64)
-tensor(3.1276, dtype=torch.float64)
-tensor(3.7491, dtype=torch.float64)
-tensor(4.1164, dtype=torch.float64)
-Dataset indices:  [28567 53979 39453 22169 22743]
-Scores:  [1.2009661249377035, 2.2764039260171707, 3.1276025968118173, 3.749139800528724, 4.116352882690027]
-Labels:  tensor([2, 8, 2, 2, 7])
-Test set: Average loss: 1.3763, Accuracy: 7306/10000 (73.06%)
-Dataset indices:  [14851 22575  3402 26534 33840]
-Scores:  [1.2655554331398218, 1.2115835165447182, 1.1866193964344587, 1.184529995866177, 1.1820928779033504]
-Labels:  tensor([3, 5, 3, 3, 3])
-tensor(1.2656, dtype=torch.float64)
-tensor(2.3293, dtype=torch.float64)
-tensor(3.1751, dtype=torch.float64)
-tensor(3.7659, dtype=torch.float64)
-tensor(4.1264, dtype=torch.float64)
-Dataset indices:  [14851 22575 38301 31847 30123]
-Scores:  [1.2655554331398218, 2.32928214553672, 3.175116531042806, 3.7658568024728405, 4.126371635540551]
-Labels:  tensor([3, 5, 4, 8, 0])
-Test set: Average loss: 1.0217, Accuracy: 7597/10000 (75.97%)
-Dataset indices:  [ 5062 44381 56627 41900 31046]
-Scores:  [1.235732028357852, 1.2029919966312257, 1.1800793694303422, 1.1435562927120584, 1.1432617767755258]
-Labels:  tensor([9, 5, 9, 2, 6])
-tensor(1.2357, dtype=torch.float64)
-tensor(2.3277, dtype=torch.float64)
-tensor(3.1517, dtype=torch.float64)
-tensor(3.7445, dtype=torch.float64)
-tensor(4.1147, dtype=torch.float64)
-Dataset indices:  [ 5062 44381  3676 23028 15494]
-Scores:  [1.2357320283578526, 2.327710782050392, 3.1516793669584073, 3.7444853551229227, 4.114718228487794]
-Labels:  tensor([9, 5, 2, 2, 7])
-Test set: Average loss: 0.8912, Accuracy: 7625/10000 (76.25%)
-Dataset indices:  [ 7833  4500 46129 42428 40856]
-Scores:  [1.2643048307037117, 1.260924740416801, 1.2401310050532453, 1.2385981688187813, 1.2364716636914745]
-Labels:  tensor([5, 0, 2, 5, 8])
-tensor(1.2643, dtype=torch.float64)
-tensor(2.3384, dtype=torch.float64)
-tensor(3.2479, dtype=torch.float64)
-tensor(3.8409, dtype=torch.float64)
-tensor(4.2037, dtype=torch.float64)
-Dataset indices:  [ 7833 46948 47925 11619 39409]
-Scores:  [1.2643048307037121, 2.338370465636314, 3.2479182123158568, 3.840896635081446, 4.203677270926962]
-Labels:  tensor([5, 5, 3, 3, 5])
-Test set: Average loss: 0.9557, Accuracy: 7475/10000 (74.75%)
+Test set: Average loss: 1.8308, Accuracy: 6338/10000 (63.38%)
+Dataset indices:  [ 8289  3582 53863 25823  8257]
+Scores:  [1.3557736757796552, 2.519825665002863, 3.4085050062563003, 3.9695525038521966, 4.2919329737575325]
+Labels:  tensor([0, 2, 3, 0, 2])
+Test set: Average loss: 1.4175, Accuracy: 6985/10000 (69.85%)
+Dataset indices:  [52012 41383 13682 42198  6185]
+Scores:  [1.3061743472090992, 2.3644483581086218, 3.221506615442796, 3.8194846029077567, 4.183660860241003]
+Labels:  tensor([8, 0, 8, 4, 3])
+Test set: Average loss: 1.2743, Accuracy: 7269/10000 (72.69%)
+Dataset indices:  [11657 37137 14866 28222 34614]
+Scores:  [1.2659351842478004, 2.3131665302748754, 3.202945514749244, 3.8116075718264586, 4.159970164562334]
+Labels:  tensor([0, 5, 7, 6, 2])
+Test set: Average loss: 1.1519, Accuracy: 7435/10000 (74.35%)
+Dataset indices:  [39411 13642 19396  8488 16077]
+Scores:  [1.3163655603620135, 2.405610005940731, 3.1817393501560343, 3.758214079939448, 4.122080265207265]
+Labels:  tensor([2, 5, 5, 6, 6])
+Test set: Average loss: 0.9635, Accuracy: 7809/10000 (78.09%)
+Dataset indices:  [40057  4606 55743 26444 37870]
+Scores:  [1.209489071500093, 2.283754189343815, 3.102376195203646, 3.6698826219743843, 4.038958571081122]
+Labels:  tensor([5, 9, 3, 1, 8])
+Test set: Average loss: 0.7743, Accuracy: 8067/10000 (80.67%)
+Dataset indices:  [ 2748 25910 24223 32954 20110]
+Scores:  [1.123391331671529, 2.140858614880564, 3.012231409824741, 3.66999233531654, 4.095480093557085]
+Labels:  tensor([2, 1, 8, 5, 4])
+Test set: Average loss: 0.6680, Accuracy: 8267/10000 (82.67%)
+Dataset indices:  [56615 37249 50461   384 32509]
+Scores:  [1.2427624719236614, 2.2830006810904986, 3.1605394537163587, 3.7497607635339576, 4.128859502902091]
+Labels:  tensor([3, 5, 7, 7, 8])
+Test set: Average loss: 0.6514, Accuracy: 8397/10000 (83.97%)
+Dataset indices:  [47695 30925 50010  3916 45114]
+Scores:  [1.190816694089635, 2.2611525375451773, 3.0947280938353208, 3.7115958775092626, 4.084116729465448]
+Labels:  tensor([4, 2, 5, 7, 7])
+Test set: Average loss: 0.5701, Accuracy: 8386/10000 (83.86%)
 </pre>
 </div>
 </div>
