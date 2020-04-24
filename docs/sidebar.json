@@ -1,11 +1,11 @@
 {
   "batchbald_redux": {
     "Overview": "/",
-    "Active learning": "/active_learning",
     "BatchBALD Algorithm": "/batchbald",
+    "Joint Entropies": "/joint_entropy_computation",
     "Consistent MC Dropout": "/consistent_mc_dropout",
-    "Example Experiment": "/example_experiment",
-    "Joint entropies": "/joint_entropy_computation",
-    "Repeated-MNIST dataset": "/repeated_mnist"
+    "Active Learning": "/active_learning",
+    "Repeated-MNIST dataset": "/repeated_mnist",
+    "Example Experiment": "/example_experiment"
   }
 }
