@@ -33,9 +33,9 @@ To aid reproducibility and baseline reproduction, we provide this simpler and cl
 
 ## How to use
 
-We provide a simple example experiment that uses this package [here](/batchbald_redux/example_experiment/). 
+We provide a simple example experiment that uses this package [here](https://blackhc.github.io/batchbald_redux/example_experiment/). 
 
-To get a candidate batch using BatchBALD, we provide a simple API in [`batchbald_redux.batchbald`](/batchbald_redux/batchbald/):
+To get a candidate batch using BatchBALD, we provide a simple API in [`batchbald_redux.batchbald`](https://blackhc.github.io/batchbald_redux/batchbald/):
 
 ```python
 from nbdev.showdoc import *
@@ -53,4 +53,4 @@ show_doc(get_batchbald_batch)
 
 
 
-We also provide a simple implementation of consistent MC dropout in [`batchbald_redux.consistent_mc_dropout`](/batchbald_redux/consistent_mc_dropout/).
+We also provide a simple implementation of consistent MC dropout in [`batchbald_redux.consistent_mc_dropout`](https://blackhc.github.io/batchbald_redux/consistent_mc_dropout/).
