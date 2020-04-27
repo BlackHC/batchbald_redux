@@ -41,7 +41,7 @@ To get a candidate batch using BatchBALD, we provide a simple API in [`batchbald
 from nbdev.showdoc import *
 from batchbald_redux.batchbald import get_batchbald_batch
 
-show_doc(get_batchbald_batch, title_level=4)
+show_doc(get_batchbald_batch)
 
 ```
 
