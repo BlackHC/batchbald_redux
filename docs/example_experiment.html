@@ -51,6 +51,23 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Appended /home/blackhc/PycharmProjects/blackhc.batchbald/src to paths
+Switched to directory /home/blackhc/PycharmProjects/blackhc.batchbald
+%load_ext autoreload
+%autoreload 2
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -301,7 +318,7 @@ description: "Experiment using Repeated MNIST and BatchBALD vs BALD vs random sa
                                             <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">batchbald</span><span class="o">.</span><span class="n">get_batchbald_batch</span><span class="p">(</span><span class="n">logits_N_K_C</span><span class="p">,</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">batchbald</span><span class="o">.</span><span class="n">get_batchbald_batch</span><span class="p">(</span><span class="n">logits_N_K_C</span><span class="o">.</span><span class="n">exp_</span><span class="p">(),</span>
                                                         <span class="n">acquisition_batch_size</span><span class="p">,</span>
                                                         <span class="n">num_samples</span><span class="p">,</span>
                                                         <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
