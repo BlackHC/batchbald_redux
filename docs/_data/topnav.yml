@@ -2,7 +2,7 @@ topnav:
 - title: Topnav
   items:
     - title: GitHub
-      external_url: https://github.com/blackhc/blackhc.batchbald
+      external_url: https://github.com/blackhc/batchbald_redux
 
 #Topnav dropdowns
 topnav_dropdowns:

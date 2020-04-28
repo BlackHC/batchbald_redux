@@ -32,6 +32,9 @@ description: "Clean reimplementation of \"BatchBALD: Efficient and Diverse Batch
 <p>For an introduction &amp; more information, see  <a href="http://batchbald.ml/">http://batchbald.ml/</a>. The paper can be found at <a href="http://arxiv.org/abs/1906.08158">http://arxiv.org/abs/1906.08158</a>.</p>
 <p>The original implementation used in the paper is available at <a href="https://github.com/BlackHC/BatchBALD">https://github.com/BlackHC/BatchBALD</a>.</p>
 <p>We are grateful for fastai's <a href="https://nbdev.fast.ai/">nbdev</a> which is powering this package.</p>
+<p>For more information, explore the sections and notebooks in the left-hand menu.
+The code is available on <a href="https://github.com/BlackHC/batchbald_redux">https://github.com/BlackHC/batchbald_redux</a>, 
+and the website on <a href="https://blackhc.github.io/batchbald_redux">https://blackhc.github.io/batchbald_redux</a>.</p>
 
 </div>
 </div>
@@ -66,6 +69,21 @@ $$a_{\text{BatchBALD}}((y_b)_B) = I[(y_b)_B;\omega]$$
 <p>In the paper, we show that this function satisfies sub-modularity, which provides us an optimality guarantee for a greedy algorithm. The candidate batch is selected using greedy expansion.</p>
 <p>Joint entropies are hard to estimate and, for everything to work, one also has to use consistent MC dropout, which keeps a set of dropout masks fixed while scoring the pool set.</p>
 <p>To aid reproducibility and baseline reproduction, we provide this simpler and clearer reimplementation.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Please-cite-us">Please cite us<a class="anchor-link" href="#Please-cite-us"> </a></h2>
+<pre><code>@misc{kirsch2019batchbald,
+    title={BatchBALD: Efficient and Diverse Batch Acquisition for Deep Bayesian Active Learning},
+    author={Andreas Kirsch and Joost van Amersfoort and Yarin Gal},
+    year={2019},
+    eprint={1906.08158},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}</code></pre>
 
 </div>
 </div>

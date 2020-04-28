@@ -8,6 +8,10 @@ The original implementation used in the paper is available at https://github.com
 
 We are grateful for fastai's [nbdev](https://nbdev.fast.ai/) which is powering this package.
 
+For more information, explore the sections and notebooks in the left-hand menu.
+The code is available on https://github.com/BlackHC/batchbald_redux, 
+and the website on https://blackhc.github.io/batchbald_redux.
+
 ## Install
 
 `pip install batchbald_redux`
@@ -30,6 +34,18 @@ Joint entropies are hard to estimate and, for everything to work, one also has t
 
 To aid reproducibility and baseline reproduction, we provide this simpler and clearer reimplementation.
 
+## Please cite us
+
+```
+@misc{kirsch2019batchbald,
+    title={BatchBALD: Efficient and Diverse Batch Acquisition for Deep Bayesian Active Learning},
+    author={Andreas Kirsch and Joost van Amersfoort and Yarin Gal},
+    year={2019},
+    eprint={1906.08158},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```
 
 ## How to use
 
