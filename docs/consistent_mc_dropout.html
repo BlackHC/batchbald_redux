@@ -2,11 +2,13 @@
 
 title: Consistent MC Dropout
 
+
 keywords: fastai
 sidebar: home_sidebar
 
 summary: "Custom consistent dropout modules"
 description: "Custom consistent dropout modules"
+nb_path: "03_consistent_mc_dropout.ipynb"
 ---
 <!--
 
@@ -47,11 +49,37 @@ description: "Custom consistent dropout modules"
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Bayesian-Module">Bayesian Module<a class="anchor-link" href="#Bayesian-Module"> </a></h2><p>To make this work in an efficient way, we are going to define an abstract wrapper module that takes a batch <code>input_B</code> and outputs <code>results_B_K</code>.</p>
 <p>Internally, it will blow up the input batch to $(B \cdot K) \times \cdots$ and then pass it to <code>mc_forward_impl</code>, which should be overriden.</p>
-<p><a href="/batchbald_redux/consistent_mc_dropout#ConsistentMCDropout"><code>ConsistentMCDropout</code></a> layers will know to reshape the inputs to $B \times K \times \cdots$ and apply consistent masks.</p>
+<p><a href="/batchbald_redux/consistent_mc_dropout.html#ConsistentMCDropout"><code>ConsistentMCDropout</code></a> layers will know to reshape the inputs to $B \times K \times \cdots$ and apply consistent masks.</p>
 
 </div>
 </div>
 </div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="BayesianModule" class="doc_header"><code>class</code> <code>BayesianModule</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianModule</code>() :: <code>Module</code></p>
+</blockquote>
+<p>A module that we can sample multiple times from given a single input batch.</p>
+<p>To be efficient, the module allows for a part of the forward pass to be deterministic.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -98,32 +126,6 @@ description: "Custom consistent dropout modules"
 </pre></div>
 
     </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="BayesianModule" class="doc_header"><code>class</code> <code>BayesianModule</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianModule</code>() :: <code>Module</code></p>
-</blockquote>
-<p>A module that we can sample multiple times from given a single input batch.</p>
-<p>To be efficient, the module allows for a part of the forward pass to be deterministic.</p>
-
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -199,13 +201,6 @@ description: "Custom consistent dropout modules"
     </div>
 </div>
 </div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -314,6 +309,13 @@ feature maps and should be used instead.</p>
 
 </div>
 </div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}

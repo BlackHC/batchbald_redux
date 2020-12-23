@@ -4,8 +4,6 @@ __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "compute_entropy": "01_batchbald.ipynb",
-         "compute_conditional_entropy_from_logits": "01_batchbald.ipynb",
-         "compute_entropy_from_logits": "01_batchbald.ipynb",
          "CandidateBatch": "01_batchbald.ipynb",
          "get_batchbald_batch": "01_batchbald.ipynb",
          "get_bald_batch": "01_batchbald.ipynb",

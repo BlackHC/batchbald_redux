@@ -53,14 +53,6 @@ We provide a simple example experiment that uses this package [here](https://bla
 
 To get a candidate batch using BatchBALD, we provide a simple API in [`batchbald_redux.batchbald`](https://blackhc.github.io/batchbald_redux/batchbald/):
 
-```python
-from nbdev.showdoc import *
-from batchbald_redux.batchbald import get_batchbald_batch
-
-show_doc(get_batchbald_batch)
-
-```
-
 
 <h4 id="get_batchbald_batch" class="doc_header"><code>get_batchbald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L110" class="source_link" style="float:right">[source]</a></h4>
 
