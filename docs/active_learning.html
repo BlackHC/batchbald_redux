@@ -2,11 +2,13 @@
 
 title: Active Learning
 
+
 keywords: fastai
 sidebar: home_sidebar
 
 summary: "Everything needed for Active Learning"
 description: "Everything needed for Active Learning"
+nb_path: "04_active_learning.ipynb"
 ---
 <!--
 
@@ -49,6 +51,31 @@ description: "Everything needed for Active Learning"
 </pre></div>
 
     </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="ActiveLearningData" class="doc_header"><code>class</code> <code>ActiveLearningData</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L17" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ActiveLearningData</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>)</p>
+</blockquote>
+<p>Splits <code>dataset</code> into an active dataset and an available dataset.</p>
+
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -129,31 +156,6 @@ description: "Everything needed for Active Learning"
 </pre></div>
 
     </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="ActiveLearningData" class="doc_header"><code>class</code> <code>ActiveLearningData</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L17" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ActiveLearningData</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>)</p>
-</blockquote>
-<p>Splits <code>dataset</code> into an active dataset and an available dataset.</p>
-
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -255,81 +257,6 @@ description: "Everything needed for Active Learning"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_balanced_sample_indices</span><span class="p">(</span><span class="n">target_classes</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">n_per_digit</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Given `target_classes` randomly sample `n_per_digit` for each of the `num_classes` classes.&quot;&quot;&quot;</span>
-    <span class="n">permed_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_classes</span><span class="p">))</span>
-
-    <span class="k">if</span> <span class="n">n_per_digit</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span>
-    
-    <span class="n">num_samples_by_class</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">initial_samples</span> <span class="o">=</span> <span class="p">[]</span>
-    
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">permed_indices</span><span class="p">)):</span>
-        <span class="n">permed_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">permed_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">index</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">permed_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_classes</span><span class="p">[</span><span class="n">permed_index</span><span class="p">])</span>
-
-        <span class="n">num_target_samples</span> <span class="o">=</span> <span class="n">num_samples_by_class</span><span class="p">[</span><span class="n">target</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">num_target_samples</span> <span class="o">==</span> <span class="n">n_per_digit</span><span class="p">:</span>
-            <span class="k">continue</span>
-            
-        <span class="n">initial_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>        
-        <span class="n">num_samples_by_class</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_samples</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_classes</span> <span class="o">*</span> <span class="n">n_per_digit</span><span class="p">:</span>
-            <span class="k">break</span>
-
-    <span class="k">return</span> <span class="n">initial_samples</span>
-
-<span class="k">def</span> <span class="nf">get_subset_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">index</span><span class="p">])</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
-
-
-<span class="k">def</span> <span class="nf">get_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">get_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">get_subset_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">indices</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">indices</span>
-
-
-<span class="k">class</span> <span class="nc">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Sampler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Sometimes, you really want to do more with little data without increasing the number of epochs.</span>
-
-<span class="sd">    This sampler takes a `dataset` and draws `target_length` samples from it (with repetition).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
-    <span class="n">target_length</span><span class="p">:</span> <span class="nb">int</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">target_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target_length</span> <span class="o">=</span> <span class="n">target_length</span>
-
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Ensure that we don&#39;t lose data by accident.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_length</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)))</span>
-
-        <span class="k">return</span> <span class="nb">iter</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_length</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_length</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
 <div class="output">
@@ -411,7 +338,7 @@ description: "Everything needed for Active Learning"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="RandomFixedLengthSampler" class="doc_header"><code>class</code> <code>RandomFixedLengthSampler</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L120" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RandomFixedLengthSampler</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>target_length</code></strong>:<code>int</code>) :: <code>Sampler</code></p>
+<h2 id="RandomFixedLengthSampler" class="doc_header"><code>class</code> <code>RandomFixedLengthSampler</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L120" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RandomFixedLengthSampler</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Sampler</code></p>
 </blockquote>
 <p>Sometimes, you really want to do more with little data without increasing the number of epochs.</p>
 <p>This sampler takes a <code>dataset</code> and draws <code>target_length</code> samples from it (with repetition).</p>
@@ -420,6 +347,81 @@ description: "Everything needed for Active Learning"
 
 </div>
 
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_balanced_sample_indices</span><span class="p">(</span><span class="n">target_classes</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">n_per_digit</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Given `target_classes` randomly sample `n_per_digit` for each of the `num_classes` classes.&quot;&quot;&quot;</span>
+    <span class="n">permed_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_classes</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">n_per_digit</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    
+    <span class="n">num_samples_by_class</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">initial_samples</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">permed_indices</span><span class="p">)):</span>
+        <span class="n">permed_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">permed_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">index</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">permed_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_classes</span><span class="p">[</span><span class="n">permed_index</span><span class="p">])</span>
+
+        <span class="n">num_target_samples</span> <span class="o">=</span> <span class="n">num_samples_by_class</span><span class="p">[</span><span class="n">target</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">num_target_samples</span> <span class="o">==</span> <span class="n">n_per_digit</span><span class="p">:</span>
+            <span class="k">continue</span>
+            
+        <span class="n">initial_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>        
+        <span class="n">num_samples_by_class</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_samples</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_classes</span> <span class="o">*</span> <span class="n">n_per_digit</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">initial_samples</span>
+
+<span class="k">def</span> <span class="nf">get_subset_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">index</span><span class="p">])</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">get_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">get_subset_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">indices</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">indices</span>
+
+
+<span class="k">class</span> <span class="nc">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Sampler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sometimes, you really want to do more with little data without increasing the number of epochs.</span>
+
+<span class="sd">    This sampler takes a `dataset` and draws `target_length` samples from it (with repetition).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
+    <span class="n">target_length</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">target_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_length</span> <span class="o">=</span> <span class="n">target_length</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Ensure that we don&#39;t lose data by accident.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_length</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_length</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_length</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 

@@ -2,11 +2,13 @@
 
 title: Repeated-MNIST Dataset
 
+
 keywords: fastai
 sidebar: home_sidebar
 
 summary: "Loading Repeated-MNIST and MNIST (with and without added noise)"
 description: "Loading Repeated-MNIST and MNIST (with and without added noise)"
+nb_path: "05_repeated_mnist.ipynb"
 ---
 <!--
 
@@ -41,6 +43,108 @@ description: "Loading Repeated-MNIST and MNIST (with and without added noise)"
 </pre></div>
 
     </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="TransformedDataset" class="doc_header"><code>class</code> <code>TransformedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L15" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TransformedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Dataset</code></p>
+</blockquote>
+<p>Transforms a dataset.</p>
+<p>Arguments:
+    dataset (Dataset): The whole Dataset
+    transformer (LambdaType): (idx, sample) -&gt; transformed_sample</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="create_repeated_MNIST_dataset" class="doc_header"><code>create_repeated_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L39" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_repeated_MNIST_dataset</code>(<strong><code>num_repetitions</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>add_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="create_MNIST_dataset" class="doc_header"><code>create_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L71" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_MNIST_dataset</code>()</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="get_targets" class="doc_header"><code>get_targets</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L75" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_targets</code>(<strong><code>dataset</code></strong>)</p>
+</blockquote>
+<p>Get the targets of a dataset without any target transforms.</p>
+<p>This supports subsets and other derivative datasets.</p>
+
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -130,108 +234,6 @@ description: "Loading Repeated-MNIST and MNIST (with and without added noise)"
 </pre></div>
 
     </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="TransformedDataset" class="doc_header"><code>class</code> <code>TransformedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L15" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TransformedDataset</code>(<strong><code>dataset</code></strong>, <strong><code>transformer</code></strong>=<em><code>None</code></em>, <strong><code>vision_transformer</code></strong>=<em><code>None</code></em>) :: <code>Dataset</code></p>
-</blockquote>
-<p>Transforms a dataset.</p>
-<p>Arguments:
-    dataset (Dataset): The whole Dataset
-    transformer (LambdaType): (idx, sample) -&gt; transformed_sample</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_repeated_MNIST_dataset" class="doc_header"><code>create_repeated_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L39" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_repeated_MNIST_dataset</code>(<strong><code>num_repetitions</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>add_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_MNIST_dataset" class="doc_header"><code>create_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L71" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_MNIST_dataset</code>()</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_targets" class="doc_header"><code>get_targets</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L75" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_targets</code>(<strong><code>dataset</code></strong>)</p>
-</blockquote>
-<p>Get the targets of a dataset without any target transforms.</p>
-<p>This supports subsets and other derivative datasets.</p>
-
-</div>
-
-</div>
-
 </div>
 </div>
 
