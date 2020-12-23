@@ -497,7 +497,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">joint_entropy</span> <span class="o">=</span> <span class="n">ExactJointEntropy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
-<span class="n">entropies</span> <span class="o">=</span> <span class="n">joint_entropy</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">compute_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">)</span>
+<span class="n">entropies</span> <span class="o">=</span> <span class="n">joint_entropy</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">log</span><span class="p">())</span><span class="o">.</span><span class="n">compute_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">())</span>
 <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">entropies</span><span class="p">,</span> <span class="p">[</span><span class="mf">5.9735</span><span class="p">,</span> <span class="mf">5.6362</span><span class="p">,</span> <span class="mf">5.9735</span><span class="p">,</span> <span class="mf">5.6362</span><span class="p">,</span> <span class="mf">5.9735</span><span class="p">,</span> <span class="mf">5.6362</span><span class="p">,</span> <span class="mf">5.9735</span><span class="p">,</span> <span class="mf">5.6362</span><span class="p">])</span>
 <span class="n">entropies</span>
 </pre></div>
@@ -511,8 +511,8 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre></pre>
+<div class="output_subarea output_stream output_stderr output_text">
+<pre></pre>
 </div>
 </div>
 
