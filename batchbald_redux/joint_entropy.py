@@ -216,11 +216,8 @@ class SampledJointEntropy(JointEntropy):
         pbar = tqdm(total=B, desc="SampledJointEntropy.compute_batch", leave=False)
 
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
-        @torch.jit.script
         def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
-            M = self.sampled_joint_probs_M_K.shape[0]
-
-            b, K, C = chunked_log_probs_b_K_C.shape[0]
+            b = chunked_log_probs_b_K_C.shape[0]
 
             probs_b_M_C = torch.empty(
                 (b, M, C),

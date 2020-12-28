@@ -772,11 +772,8 @@ nb_path: "02_joint_entropy_computation.ipynb"
         <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;SampledJointEntropy.compute_batch&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">log_probs_B_K_C</span><span class="p">,</span> <span class="n">initial_step</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
         <span class="k">def</span> <span class="nf">chunked_joint_entropy</span><span class="p">(</span><span class="n">chunked_log_probs_b_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampled_joint_probs_M_K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-            <span class="n">b</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">chunked_log_probs_b_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">chunked_log_probs_b_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
             <span class="n">probs_b_M_C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
                 <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">),</span>
@@ -1058,7 +1055,7 @@ attribute lookup is not defined on python value of type &#39;SampledJointEntropy
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DynamicJointEntropy" class="doc_header"><code>class</code> <code>DynamicJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L254" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DynamicJointEntropy</code>(<strong><code>M</code></strong>:<code>int</code>, <strong><code>max_N</code></strong>:<code>int</code>, <strong><code>K</code></strong>:<code>int</code>, <strong><code>C</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
+<h2 id="DynamicJointEntropy" class="doc_header"><code>class</code> <code>DynamicJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L251" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DynamicJointEntropy</code>(<strong><code>M</code></strong>:<code>int</code>, <strong><code>max_N</code></strong>:<code>int</code>, <strong><code>K</code></strong>:<code>int</code>, <strong><code>C</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
 </blockquote>
 <p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.add_variables"><code>JointEntropy.add_variables</code></a>.</p>
 <p><a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.compute"><code>JointEntropy.compute</code></a> computes the joint entropy.</p>
@@ -1139,7 +1136,7 @@ attribute lookup is not defined on python value of type &#39;SampledJointEntropy
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="DynamicJointEntropy.add_variables" class="doc_header"><code>DynamicJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L268" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>DynamicJointEntropy.add_variables</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
+<h4 id="DynamicJointEntropy.add_variables" class="doc_header"><code>DynamicJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L265" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>DynamicJointEntropy.add_variables</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
 </blockquote>
 <p>Expands the joint entropy to include more terms.</p>
 
@@ -1151,7 +1148,7 @@ attribute lookup is not defined on python value of type &#39;SampledJointEntropy
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="DynamicJointEntropy.compute_batch" class="doc_header"><code>DynamicJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L289" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>DynamicJointEntropy.compute_batch</code>(<strong><code>log_probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="DynamicJointEntropy.compute_batch" class="doc_header"><code>DynamicJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L286" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>DynamicJointEntropy.compute_batch</code>(<strong><code>log_probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>Computes the joint entropy of the added variables together with the batch (one by one).</p>
 
