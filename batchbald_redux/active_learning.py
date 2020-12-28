@@ -4,18 +4,19 @@ __all__ = ['ActiveLearningData', 'get_balanced_sample_indices', 'get_subset_base
            'RandomFixedLengthSampler']
 
 # Cell
-from typing import Dict, List
-import numpy as np
-import torch.utils.data as data
-import torch
 import collections
+from typing import Dict, List
 
+import numpy as np
+import torch
+import torch.utils.data as data
 
 # Cell
 
 
 class ActiveLearningData:
     """Splits `dataset` into an active dataset and an available dataset."""
+
     dataset: data.Dataset
     training_dataset: data.Dataset
     pool_dataset: data.Dataset
@@ -25,8 +26,8 @@ class ActiveLearningData:
     def __init__(self, dataset: data.Dataset):
         super().__init__()
         self.dataset = dataset
-        self.training_mask = np.full((len(dataset), ), False)
-        self.pool_mask = np.full((len(dataset), ), True)
+        self.training_mask = np.full((len(dataset),), False)
+        self.pool_mask = np.full((len(dataset),), True)
 
         self.training_dataset = data.Subset(self.dataset, None)
         self.pool_dataset = data.Subset(self.dataset, None)
@@ -67,8 +68,7 @@ class ActiveLearningData:
         """Extract a dataset randomly from the pool dataset and make those indices unavailable.
 
         Useful for extracting a validation set."""
-        return self.extract_dataset_from_pool_from_indices(
-            self.get_random_pool_indices(size))
+        return self.extract_dataset_from_pool_from_indices(self.get_random_pool_indices(size))
 
     def extract_dataset_from_pool_from_indices(self, pool_indices) -> data.Dataset:
         """Extract a dataset from the pool dataset and make those indices unavailable.
@@ -80,6 +80,7 @@ class ActiveLearningData:
         return data.Subset(self.dataset, dataset_indices)
 
 # Cell
+
 
 def get_balanced_sample_indices(target_classes: List, num_classes, n_per_digit=2) -> List[int]:
     """Given `target_classes` randomly sample `n_per_digit` for each of the `num_classes` classes."""
@@ -107,6 +108,7 @@ def get_balanced_sample_indices(target_classes: List, num_classes, n_per_digit=2
 
     return initial_samples
 
+
 def get_subset_base_indices(dataset: data.Subset, indices: List[int]):
     return [int(dataset.indices[index]) for index in indices]
 
@@ -123,6 +125,7 @@ class RandomFixedLengthSampler(data.Sampler):
 
     This sampler takes a `dataset` and draws `target_length` samples from it (with repetition).
     """
+
     dataset: data.Dataset
     target_length: int
 

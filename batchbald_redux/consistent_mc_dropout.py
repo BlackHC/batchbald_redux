@@ -9,6 +9,7 @@ from torch.nn import Module
 
 # Cell
 
+
 class BayesianModule(Module):
     """A module that we can sample multiple times from given a single input batch.
 
@@ -47,6 +48,7 @@ class BayesianModule(Module):
         return input.unsqueeze(1).expand(mc_shape).flatten(0, 1)
 
 # Cell
+
 
 class _ConsistentMCDropout(Module):
     def __init__(self, p=0.5):
@@ -100,8 +102,8 @@ class _ConsistentMCDropout(Module):
         # Flatten MCDI, batch into one dimension again.
         return BayesianModule.flatten_tensor(mc_output)
 
-
 # Cell
+
 
 class ConsistentMCDropout(_ConsistentMCDropout):
     r"""Randomly zeroes some of the elements of the input

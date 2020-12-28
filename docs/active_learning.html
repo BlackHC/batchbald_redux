@@ -43,11 +43,12 @@ nb_path: "04_active_learning.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch.utils.data</span> <span class="k">as</span> <span class="nn">data</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">torch.utils.data</span> <span class="k">as</span> <span class="nn">data</span>
 </pre></div>
 
     </div>
@@ -91,6 +92,7 @@ nb_path: "04_active_learning.ipynb"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">ActiveLearningData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Splits `dataset` into an active dataset and an available dataset.&quot;&quot;&quot;</span>
+
     <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
     <span class="n">training_dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
     <span class="n">pool_dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
@@ -100,8 +102,8 @@ nb_path: "04_active_learning.ipynb"
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">training_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pool_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">training_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),),</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),),</span> <span class="kc">True</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pool_dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -119,7 +121,7 @@ nb_path: "04_active_learning.ipynb"
 
     <span class="k">def</span> <span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool_indices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Acquire elements from the pool dataset into the training dataset.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Add them to training dataset &amp; remove them from the pool dataset.&quot;&quot;&quot;</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset_indices</span><span class="p">(</span><span class="n">pool_indices</span><span class="p">)</span>
 
@@ -140,14 +142,13 @@ nb_path: "04_active_learning.ipynb"
 
     <span class="k">def</span> <span class="nf">extract_dataset_from_pool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Extract a dataset randomly from the pool dataset and make those indices unavailable.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Useful for extracting a validation set.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_dataset_from_pool_from_indices</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_random_pool_indices</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_dataset_from_pool_from_indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_random_pool_indices</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">extract_dataset_from_pool_from_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool_indices</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Extract a dataset from the pool dataset and make those indices unavailable.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Useful for extracting a validation set.&quot;&quot;&quot;</span>
         <span class="n">dataset_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset_indices</span><span class="p">(</span><span class="n">pool_indices</span><span class="p">)</span>
 
@@ -173,7 +174,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ActiveLearningData.get_dataset_indices" class="doc_header"><code>ActiveLearningData.get_dataset_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L40" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.get_dataset_indices</code>(<strong><code>pool_indices</code></strong>:<code>List</code>[<code>int</code>])</p>
+<h4 id="ActiveLearningData.get_dataset_indices" class="doc_header"><code>ActiveLearningData.get_dataset_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L41" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.get_dataset_indices</code>(<strong><code>pool_indices</code></strong>:<code>List</code>[<code>int</code>])</p>
 </blockquote>
 <p>Transform indices (in <code>pool_dataset</code>) to indices in the original <code>dataset</code>.</p>
 
@@ -185,7 +186,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ActiveLearningData.acquire" class="doc_header"><code>ActiveLearningData.acquire</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L45" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.acquire</code>(<strong><code>pool_indices</code></strong>)</p>
+<h4 id="ActiveLearningData.acquire" class="doc_header"><code>ActiveLearningData.acquire</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L46" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.acquire</code>(<strong><code>pool_indices</code></strong>)</p>
 </blockquote>
 <p>Acquire elements from the pool dataset into the training dataset.</p>
 <p>Add them to training dataset &amp; remove them from the pool dataset.</p>
@@ -198,7 +199,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ActiveLearningData.remove_from_pool" class="doc_header"><code>ActiveLearningData.remove_from_pool</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L55" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.remove_from_pool</code>(<strong><code>pool_indices</code></strong>)</p>
+<h4 id="ActiveLearningData.remove_from_pool" class="doc_header"><code>ActiveLearningData.remove_from_pool</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L56" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.remove_from_pool</code>(<strong><code>pool_indices</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -209,7 +210,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ActiveLearningData.get_random_pool_indices" class="doc_header"><code>ActiveLearningData.get_random_pool_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L61" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.get_random_pool_indices</code>(<strong><code>size</code></strong>)</p>
+<h4 id="ActiveLearningData.get_random_pool_indices" class="doc_header"><code>ActiveLearningData.get_random_pool_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L62" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.get_random_pool_indices</code>(<strong><code>size</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -220,7 +221,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ActiveLearningData.extract_dataset_from_pool" class="doc_header"><code>ActiveLearningData.extract_dataset_from_pool</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L66" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.extract_dataset_from_pool</code>(<strong><code>size</code></strong>)</p>
+<h4 id="ActiveLearningData.extract_dataset_from_pool" class="doc_header"><code>ActiveLearningData.extract_dataset_from_pool</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L67" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ActiveLearningData.extract_dataset_from_pool</code>(<strong><code>size</code></strong>)</p>
 </blockquote>
 <p>Extract a dataset randomly from the pool dataset and make those indices unavailable.</p>
 <p>Useful for extracting a validation set.</p>
@@ -265,7 +266,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_balanced_sample_indices" class="doc_header"><code>get_balanced_sample_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L84" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_balanced_sample_indices</code>(<strong><code>target_classes</code></strong>:<code>List</code>[<code>T</code>], <strong><code>num_classes</code></strong>, <strong><code>n_per_digit</code></strong>=<em><code>2</code></em>)</p>
+<h4 id="get_balanced_sample_indices" class="doc_header"><code>get_balanced_sample_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L85" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_balanced_sample_indices</code>(<strong><code>target_classes</code></strong>:<code>List</code>[<code>T</code>], <strong><code>num_classes</code></strong>, <strong><code>n_per_digit</code></strong>=<em><code>2</code></em>)</p>
 </blockquote>
 <p>Given <code>target_classes</code> randomly sample <code>n_per_digit</code> for each of the <code>num_classes</code> classes.</p>
 
@@ -290,7 +291,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_subset_base_indices" class="doc_header"><code>get_subset_base_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L110" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_subset_base_indices</code>(<strong><code>dataset</code></strong>:<code>Subset</code>, <strong><code>indices</code></strong>:<code>List</code>[<code>int</code>])</p>
+<h4 id="get_subset_base_indices" class="doc_header"><code>get_subset_base_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L112" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_subset_base_indices</code>(<strong><code>dataset</code></strong>:<code>Subset</code>, <strong><code>indices</code></strong>:<code>List</code>[<code>int</code>])</p>
 </blockquote>
 
 </div>
@@ -314,7 +315,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_base_indices" class="doc_header"><code>get_base_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L114" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_base_indices</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>indices</code></strong>:<code>List</code>[<code>int</code>])</p>
+<h4 id="get_base_indices" class="doc_header"><code>get_base_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L116" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_base_indices</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>indices</code></strong>:<code>List</code>[<code>int</code>])</p>
 </blockquote>
 
 </div>
@@ -338,7 +339,7 @@ nb_path: "04_active_learning.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="RandomFixedLengthSampler" class="doc_header"><code>class</code> <code>RandomFixedLengthSampler</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L120" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RandomFixedLengthSampler</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Sampler</code></p>
+<h2 id="RandomFixedLengthSampler" class="doc_header"><code>class</code> <code>RandomFixedLengthSampler</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/active_learning.py#L122" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RandomFixedLengthSampler</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Sampler</code></p>
 </blockquote>
 <p>Sometimes, you really want to do more with little data without increasing the number of epochs.</p>
 <p>This sampler takes a <code>dataset</code> and draws <code>target_length</code> samples from it (with repetition).</p>
@@ -366,10 +367,10 @@ nb_path: "04_active_learning.ipynb"
 
     <span class="k">if</span> <span class="n">n_per_digit</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
-    
+
     <span class="n">num_samples_by_class</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">initial_samples</span> <span class="o">=</span> <span class="p">[]</span>
-    
+
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">permed_indices</span><span class="p">)):</span>
         <span class="n">permed_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">permed_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="n">index</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">permed_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_classes</span><span class="p">[</span><span class="n">permed_index</span><span class="p">])</span>
@@ -377,14 +378,15 @@ nb_path: "04_active_learning.ipynb"
         <span class="n">num_target_samples</span> <span class="o">=</span> <span class="n">num_samples_by_class</span><span class="p">[</span><span class="n">target</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">num_target_samples</span> <span class="o">==</span> <span class="n">n_per_digit</span><span class="p">:</span>
             <span class="k">continue</span>
-            
-        <span class="n">initial_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>        
+
+        <span class="n">initial_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="n">num_samples_by_class</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_samples</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_classes</span> <span class="o">*</span> <span class="n">n_per_digit</span><span class="p">:</span>
             <span class="k">break</span>
 
     <span class="k">return</span> <span class="n">initial_samples</span>
+
 
 <span class="k">def</span> <span class="nf">get_subset_base_indices</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
     <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">index</span><span class="p">])</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
@@ -402,6 +404,7 @@ nb_path: "04_active_learning.ipynb"
 
 <span class="sd">    This sampler takes a `dataset` and draws `target_length` samples from it (with repetition).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
     <span class="n">target_length</span><span class="p">:</span> <span class="nb">int</span>
 

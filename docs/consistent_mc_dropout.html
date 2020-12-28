@@ -65,7 +65,7 @@ nb_path: "03_consistent_mc_dropout.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="BayesianModule" class="doc_header"><code>class</code> <code>BayesianModule</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianModule</code>() :: <code>Module</code></p>
+<h2 id="BayesianModule" class="doc_header"><code>class</code> <code>BayesianModule</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L13" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianModule</code>() :: <code>Module</code></p>
 </blockquote>
 <p>A module that we can sample multiple times from given a single input batch.</p>
 <p>To be efficient, the module allows for a part of the forward pass to be deterministic.</p>
@@ -151,7 +151,7 @@ nb_path: "03_consistent_mc_dropout.ipynb"
 
         <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dropout probability has to be between 0 and 1, &quot;</span> <span class="s2">&quot;but got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
-            
+
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -216,7 +216,7 @@ nb_path: "03_consistent_mc_dropout.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConsistentMCDropout" class="doc_header"><code>class</code> <code>ConsistentMCDropout</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L106" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
+<h2 id="ConsistentMCDropout" class="doc_header"><code>class</code> <code>ConsistentMCDropout</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L108" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
 </blockquote>
 <p>Randomly zeroes some of the elements of the input
 tensor with probability :attr:<code>p</code> using samples from a Bernoulli
@@ -269,7 +269,7 @@ identity function.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConsistentMCDropout2d" class="doc_header"><code>class</code> <code>ConsistentMCDropout2d</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L142" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout2d</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
+<h2 id="ConsistentMCDropout2d" class="doc_header"><code>class</code> <code>ConsistentMCDropout2d</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L144" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout2d</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
 </blockquote>
 <p>Randomly zeroes whole channels of the input tensor.
 The channels to zero-out are randomized on every forward call.</p>
@@ -338,6 +338,7 @@ feature maps and should be used instead.</p>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span> <span class="k">as</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
+
 <span class="k">class</span> <span class="nc">BayesianCNN</span><span class="p">(</span><span class="n">BayesianModule</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -359,7 +360,8 @@ feature maps and should be used instead.</p>
         <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">input</span>
-    
+
+
 <span class="n">BayesianCNN</span><span class="p">()</span>
 </pre></div>
 
