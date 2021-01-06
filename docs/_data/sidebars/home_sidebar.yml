@@ -10,20 +10,20 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Joint Entropies
-      url: joint_entropy_computation.html
-    - output: web,pdf
-      title: Repeated-MNIST Dataset
-      url: repeated_mnist.html
-    - output: web,pdf
       title: BatchBALD Algorithm
       url: batchbald.html
+    - output: web,pdf
+      title: Joint Entropies
+      url: joint_entropy_computation.html
     - output: web,pdf
       title: Consistent MC Dropout
       url: consistent_mc_dropout.html
     - output: web,pdf
       title: Active Learning
       url: active_learning.html
+    - output: web,pdf
+      title: Repeated-MNIST Dataset
+      url: repeated_mnist.html
     - output: web,pdf
       title: Example Experiment
       url: example_experiment.html
