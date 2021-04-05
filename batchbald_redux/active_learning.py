@@ -137,9 +137,14 @@ class RandomFixedLengthSampler(data.Sampler):
     def __iter__(self):
         # Ensure that we don't lose data by accident.
         if self.target_length < len(self.dataset):
-            return iter(range(len(self.dataset)))
+            return iter(torch.randperm(len(self.dataset)).tolist())
 
-        return iter((torch.randperm(self.target_length) % len(self.dataset)).tolist())
+        # Sample slightly more indices to avoid biasing towards start of dataset
+        indices = torch.randperm(
+            self.target_length + (self.target_length % self.dataset)
+        )
+
+        return iter((indices[:self.target_length] % len(self.dataset)).tolist())
 
     def __len__(self):
         return self.target_length
