@@ -139,9 +139,10 @@ class RandomFixedLengthSampler(data.Sampler):
         if self.target_length < len(self.dataset):
             return iter(torch.randperm(len(self.dataset)).tolist())
 
-        # Sample slightly more indices to avoid biasing towards start of dataset
+        # Sample slightly more indices to avoid biasing towards start of dataset.
+        # Have the same number of duplicates for each sample.
         indices = torch.randperm(
-            self.target_length + (self.target_length % self.dataset)
+            self.target_length + (-self.target_length % self.dataset)
         )
 
         return iter((indices[:self.target_length] % len(self.dataset)).tolist())
