@@ -185,8 +185,8 @@ class SampledJointEntropy(JointEntropy):
 
     def compute(self) -> torch.Tensor:
         sampled_joint_probs_M = torch.mean(self.sampled_joint_probs_M_K, dim=1, keepdim=False)
-        nats_M = -torch.log(sampled_joint_probs_M)
-        entropy = torch.mean(nats_M)
+        nats_M = -torch.log(sampled_joint_probs_M) * sampled_joint_probs_M
+        entropy = torch.sum(nats_M)
         return entropy
 
     def add_variables(self, log_probs_N_K_C: torch.Tensor, M2: int) -> "SampledJointEntropy":
@@ -217,7 +217,8 @@ class SampledJointEntropy(JointEntropy):
 
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
         def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
-            b = chunked_log_probs_b_K_C.shape[0]
+            chunked_probs_b_K_C = chunked_log_probs_b_K_C.exp()
+            b = chunked_probs_b_K_C.shape[0]
 
             probs_b_M_C = torch.empty(
                 (b, M, C),
@@ -227,7 +228,7 @@ class SampledJointEntropy(JointEntropy):
             for i in range(b):
                 torch.matmul(
                     self.sampled_joint_probs_M_K,
-                    chunked_log_probs_b_K_C[i].to(self.sampled_joint_probs_M_K, non_blocking=True).exp(),
+                    chunked_probs_b_K_C[i].to(self.sampled_joint_probs_M_K, non_blocking=True).exp(),
                     out=probs_b_M_C[i],
                 )
             probs_b_M_C /= K
