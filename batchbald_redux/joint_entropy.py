@@ -190,7 +190,8 @@ class SampledJointEntropy(JointEntropy):
         return entropy
 
     def add_variables(self, log_probs_N_K_C: torch.Tensor, M2: int) -> "SampledJointEntropy":
-        assert self.sampled_joint_probs_M_K.shape[1] == log_probs_N_K_C.shape[1]
+        K = self.sampled_joint_probs_M_K.shape[1]
+        assert K == log_probs_N_K_C.shape[1]
 
         sample_K_M1_1 = self.sampled_joint_probs_M_K.t()[:, :, None]
 
