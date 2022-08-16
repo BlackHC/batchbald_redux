@@ -2,7 +2,7 @@
 > Clean reimplementation of \"BatchBALD: Efficient and Diverse Batch Acquisition for Deep Bayesian Active Learning\"
 
 
-For an introduction & more information, see  http://batchbald.ml/. The paper can be found at http://arxiv.org/abs/1906.08158.
+For an introduction & more information, see http://blackhc.github.io/batchbald_redux/. The paper can be found at http://arxiv.org/abs/1906.08158.
 
 The original implementation used in the paper is available at https://github.com/BlackHC/BatchBALD.
 
